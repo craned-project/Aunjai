@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -54,7 +53,6 @@ class _HomePageState extends State<HomePage> {
 }
 
 // --- UI Layout Sub-builders ---
-
 Widget _buildHeader() {
   // Get the height of the device's status bar area dynamically
   String username = "ธีระวิทย์";
@@ -263,7 +261,9 @@ Widget _buildFeatureGrid(BuildContext context) {
       title: "Message",
       subtitle: "SMS / แชท / อีเมล",
       actionText: "อุ่นใจ Message",
-      onTap: () {},
+      onTap: () {
+        Navigator.pushNamed(context, '/message');
+      },
     ),
     FeatureItem(
       icon: Icons.image_outlined,
@@ -308,74 +308,61 @@ Widget _buildFeatureGrid(BuildContext context) {
 }
 
 Widget _buildCard(FeatureItem item) {
-  return Container(
-    padding: const EdgeInsets.all(16.0),
-    decoration: BoxDecoration(
-      color: const Color(0xff111827).withValues(alpha: 0.6),
-      borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      // 1. Change this to mainAxisSize.min or start so things don't force stretch apart
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Wrap EVERYTHING in a single top Column so they stay grouped together tightly
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: item.iconBgColor,
-                borderRadius: BorderRadius.circular(12),
+  // 1. Wrap the entire card with a GestureDetector
+  return GestureDetector(
+    behavior: HitTestBehavior.opaque, // Makes the entire surface clickable
+    onTap: item.onTap,                // 🎯 Fires the specific onTap feature function you defined!
+    child: Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: const Color(0xff111827).withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: item.iconBgColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(item.icon, color: item.iconColor, size: 24),
               ),
-              child: Icon(item.icon, color: item.iconColor, size: 24),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              item.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              const SizedBox(height: 16),
+              Text(
+                item.title,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              item.subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white.withValues(alpha: 0.5),
+              const SizedBox(height: 4),
+              Text(
+                item.subtitle,
+                style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.5)),
               ),
-            ),
-
-            // 2. Control the exact spacing before the line manually right here!
-            const SizedBox(height: 16),
-            Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
-          ],
-        ),
-
-        // This stays locked to the very bottom area of your card bounds
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              item.actionText,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xff2563eb),
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 16),
+              Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                item.actionText,
+                style: const TextStyle(fontSize: 13, color: Color(0xff2563eb), fontWeight: FontWeight.w600),
               ),
-            ),
-            const Icon(Icons.arrow_forward, size: 14, color: Color(0xff2563eb)),
-          ],
-        ),
-      ],
+              const Icon(Icons.arrow_forward, size: 14, color: Color(0xff2563eb)),
+            ],
+          ),
+        ],
+      ),
     ),
   );
 }
-
 class FeatureItem {
   final IconData icon;
   final Color iconColor;

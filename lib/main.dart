@@ -1,3 +1,4 @@
+import 'package:aunjai/pages/message.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +46,9 @@ class _MyAppState extends State<MyApp> {
           children: _pages,
         ),
       ),
+      routes: {
+        '/message': (context) => Message()
+      }
     );
   }
 }
