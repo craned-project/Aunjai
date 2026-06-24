@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -262,7 +263,8 @@ Widget _buildFeatureGrid(BuildContext context) {
       subtitle: "SMS / แชท / อีเมล",
       actionText: "อุ่นใจ Message",
       onTap: () {
-        Navigator.pushNamed(context, '/message');
+        // 🎯 Flawlessly moves to the sub-page while keeping the nav bar visible!
+        context.go('/message');
       },
     ),
     FeatureItem(
@@ -311,13 +313,17 @@ Widget _buildCard(FeatureItem item) {
   // 1. Wrap the entire card with a GestureDetector
   return GestureDetector(
     behavior: HitTestBehavior.opaque, // Makes the entire surface clickable
-    onTap: item.onTap,                // 🎯 Fires the specific onTap feature function you defined!
+    onTap:
+        item.onTap, // 🎯 Fires the specific onTap feature function you defined!
     child: Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: const Color(0xff111827).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.08),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,12 +343,19 @@ Widget _buildCard(FeatureItem item) {
               const SizedBox(height: 16),
               Text(
                 item.title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 item.subtitle,
-                style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.5)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
               ),
               const SizedBox(height: 16),
               Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
@@ -353,9 +366,17 @@ Widget _buildCard(FeatureItem item) {
             children: [
               Text(
                 item.actionText,
-                style: const TextStyle(fontSize: 13, color: Color(0xff2563eb), fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xff2563eb),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const Icon(Icons.arrow_forward, size: 14, color: Color(0xff2563eb)),
+              const Icon(
+                Icons.arrow_forward,
+                size: 14,
+                color: Color(0xff2563eb),
+              ),
             ],
           ),
         ],
@@ -363,6 +384,7 @@ Widget _buildCard(FeatureItem item) {
     ),
   );
 }
+
 class FeatureItem {
   final IconData icon;
   final Color iconColor;
