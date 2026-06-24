@@ -1,3 +1,4 @@
+import 'package:aunjai/pages/history.dart';
 import 'package:aunjai/pages/message.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,7 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: '/history',
           builder: (context, state) => const Center(
-            child: Text("ประวัติ", style: TextStyle(fontSize: 24)),
+            child: History(),
           ),
         ),
         GoRoute(

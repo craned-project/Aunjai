@@ -31,7 +31,6 @@ class _MessageState extends State<Message> {
 
   // Tracks which tab is selected: 0 = SMS, 1 = แชท, 2 = Email
   int _selectedTabIndex = 0;
-  final TextEditingController _firstTextController = TextEditingController();
 
   MessageType packageMessage() {
     final List<String> msgList = _controllers
