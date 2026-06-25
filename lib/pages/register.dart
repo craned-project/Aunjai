@@ -1,0 +1,459 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _hasAcceptedTerms = false;
+  bool _obscurePassword = true;
+  bool _isFormInputValid =
+      false; // 🎯 Tracks if all text fields are filled out properly
+
+  @override
+  void initState() {
+    super.initState();
+    // Listeners to validate the button state reactively as the user types
+    _usernameController.addListener(_validateFormState);
+    _emailController.addListener(_validateFormState);
+    _passwordController.addListener(_validateFormState);
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _validateFormState() {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    // Direct reactive evaluation criteria
+    final isValid =
+        username.isNotEmpty &&
+        email.isNotEmpty &&
+        email.contains('@') &&
+        password.length >= 8;
+
+    if (isValid != _isFormInputValid) {
+      setState(() {
+        _isFormInputValid = isValid;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Both text fields must be valid AND the terms checkbox must be selected
+    bool _canSubmit = _hasAcceptedTerms && _isFormInputValid;
+
+    return Scaffold(
+      body: Container(
+        // 🌌 Forces the dark app background gradient to stretch 100% full screen
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xff091026), // Top deep navy blue
+              Color(0xff050814), // Bottom dark base background
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Ambient Top Left Blue Glow
+            Positioned(
+              top: -150,
+              left: -100,
+              child: Container(
+                width: 350,
+                height: 350,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.transparent,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xff0ea5e9).withValues(alpha: 0.12),
+                      blurRadius: 140,
+                      spreadRadius: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Beautiful Bottom Airbrushed Purple Halo
+            Positioned(
+              bottom: -100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: 320,
+                  height: 320,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.transparent,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xff6366f1).withValues(alpha: 0.25),
+                        blurRadius: 120,
+                        spreadRadius: 40,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Scrollable UI Content
+            GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+
+                        // Back Button Arrow Anchor
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xff111827,
+                            ).withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).maybePop();
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Mascot Graphic Frame
+                        Center(
+                          child: SizedBox(
+                            height: 140,
+                            child: Image.asset(
+                              'logo/blue.png',
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Text(
+                                    "🤖",
+                                    style: TextStyle(fontSize: 64),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Headings Block
+                        const Center(
+                          child: Text(
+                            "สร้างบัญชีใหม่",
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Center(
+                          child: Text(
+                            "ระบบ AI ผู้ช่วยตรวจจับภัยหลอกลวงออนไลน์",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // 1. Username Field
+                        _buildFieldLabel("ชื่อผู้ใช้งาน"),
+                        _buildInputField(
+                          controller: _usernameController,
+                          hintText: "กรอกชื่อผู้ใช้งานของคุณ",
+                          onChanged: (_) => _validateFormState(),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // 2. Email Field
+                        _buildFieldLabel("อีเมล"),
+                        _buildInputField(
+                          controller: _emailController,
+                          hintText: "example@mail.com",
+                          keyboardType: TextInputType.emailAddress,
+                          onChanged: (_) => _validateFormState(),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // 3. Password Field
+                        _buildFieldLabel("รหัสผ่าน"),
+                        _buildInputField(
+                          controller: _passwordController,
+                          hintText: "กำหนดรหัสผ่าน (อย่างน้อย 8 ตัวอักษร)",
+                          obscureText: _obscurePassword,
+                          onChanged: (_) => _validateFormState(),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.white.withValues(alpha: 0.38),
+                              size: 20,
+                            ),
+                            onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Terms and Conditions Consent Checkbox
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Theme(
+                              data: ThemeData(
+                                unselectedWidgetColor: Colors.white.withValues(
+                                  alpha: 0.24,
+                                ),
+                              ),
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Checkbox(
+                                  value: _hasAcceptedTerms,
+                                  activeColor: const Color(0xff2563eb),
+                                  checkColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  side: BorderSide(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                  ),
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _hasAcceptedTerms = val ?? false;
+                                    });
+                                    _validateFormState();
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                "ฉันยอมรับให้แอปอุ่นใจเก็บ ประมวลผล และวิเคราะห์ข้อมูลข้อความ/ลิงก์ เพื่อแจ้งเตือนความปลอดภัยตามนโยบายคุ้มครองข้อมูลส่วนบุคคล",
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.4),
+                                  fontSize: 12,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 36),
+
+                        // Gradient Button (Unlocks with a gorgeous green light/glow style dynamically)
+                        Container(
+                          width: double.infinity,
+                          height: 54,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              colors: _canSubmit
+                                  ? [
+                                      const Color(0xff2563eb),
+                                      const Color(0xff7c3aed),
+                                    ]
+                                  : [
+                                      const Color(
+                                        0xff1e293b,
+                                      ).withValues(alpha: 0.6),
+                                      const Color(
+                                        0xff1e293b,
+                                      ).withValues(alpha: 0.6),
+                                    ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            boxShadow: _canSubmit
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xff7c3aed,
+                                      ).withValues(alpha: 0.25),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: _canSubmit
+                                ? () {
+                                    // 1. Trigger the standard form layout validation checks
+                                    if (_formKey.currentState!.validate()) {
+                                      // 🎯 2. Package your fields into the exact structured map format you requested!
+                                      final Map<String, String>
+                                      registrationData = {
+                                        'user': _usernameController.text.trim(),
+                                        'email': _emailController.text.trim(),
+                                        'password': _passwordController.text,
+                                      };
+
+                                      // 3. Print or pass this object to your API authentication function
+                                      print(
+                                        "Packed Registration Data: $registrationData",
+                                      );
+
+                                    }
+                                  }
+                                : null,
+                            child: Text(
+                              "ลงทะเบียนเข้าใช้งาน",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: _canSubmit
+                                    ? Colors.white
+                                    : Colors.white.withValues(alpha: 0.24),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+
+                        // Footer Switch Redirect Link
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "มีบัญชีผู้ใช้งานอยู่แล้วใช่ไหม? ",
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.4),
+                                fontSize: 16,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                context.go('/login');
+                              },
+                              child: const Text(
+                                "เข้าสู่ระบบ",
+                                style: TextStyle(
+                                  color: Color(0xff3b82f6),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFieldLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8.0),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.6),
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+
+  // 🎯 FIXED SIGNATURE: Fully accepts and utilizes the onChanged callback now!
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String hintText,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+    ValueChanged<String>? onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff111827).withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      padding: const EdgeInsets.only(left: 14),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        textAlignVertical: TextAlignVertical
+            .center, // Keeps your text vertically centered with icons
+        validator: validator,
+        onChanged: onChanged,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: Colors.white.withValues(alpha: 0.2),
+            fontSize: 16,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 16),
+          suffixIcon: suffixIcon,
+        ),
+      ),
+    );
+  }
+}

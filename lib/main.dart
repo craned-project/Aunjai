@@ -1,7 +1,9 @@
 import 'package:aunjai/pages/history.dart';
 import 'package:aunjai/pages/link.dart';
+import 'package:aunjai/pages/login.dart';
 import 'package:aunjai/pages/message.dart';
 import 'package:aunjai/pages/home.dart';
+import 'package:aunjai/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,13 +16,13 @@ final GoRouter _router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/home', // Start on the home screen
   routes: [
-    // 2. The ShellRoute creates a permanent wrapper around all sub-routes nested inside it
+    // 1. The ShellRoute handles everything that REQUIRES the navbar wrapper
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) {
         final String location = state.matchedLocation;
 
-        int currentIndex = -1; // 🎯 Default to -1 (No tab highlighted!)
+        int currentIndex = -1; // Default to -1 (No tab highlighted!)
 
         if (location == '/home') currentIndex = 0;
         if (location == '/notifications') currentIndex = 1;
@@ -28,7 +30,7 @@ final GoRouter _router = GoRouter(
         if (location == '/profile') currentIndex = 3;
 
         return MainScreenHolder(
-          currentIndex: currentIndex, // Passes -1 when you are on /message!
+          currentIndex: currentIndex,
           onTabSelected: (index) {
             switch (index) {
               case 0:
@@ -49,18 +51,10 @@ final GoRouter _router = GoRouter(
         );
       },
       routes: [
-        // 3. These sub-pages will swap dynamically inside the MainScreenHolder container
+        // Sub-pages that keep the navigation bar visible
         GoRoute(path: '/home', builder: (context, state) => const HomePage()),
-        GoRoute(
-          path: '/message',
-          builder: (context, state) =>
-              const Message(), // 👈 Your sub-page now stays inside the shell!
-        ),
-        GoRoute(
-          path: '/link',
-          builder: (context, state) =>
-              const LinkCheck(), // 👈 Your sub-page now stays inside the shell!
-        ),
+        GoRoute(path: '/message', builder: (context, state) => const Message()),
+        GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
         GoRoute(
           path: '/notifications',
           builder: (context, state) => const Center(
@@ -69,9 +63,7 @@ final GoRouter _router = GoRouter(
         ),
         GoRoute(
           path: '/history',
-          builder: (context, state) => const Center(
-            child: History(),
-          ),
+          builder: (context, state) => const Center(child: History()),
         ),
         GoRoute(
           path: '/profile',
@@ -80,6 +72,20 @@ final GoRouter _router = GoRouter(
           ),
         ),
       ],
+    ),
+
+    // 🎯 2. Placed OUTSIDE the ShellRoute so the navbar disappears completely!
+    GoRoute(
+      path: '/register',
+      parentNavigatorKey:
+          _rootNavigatorKey, // Forces it to open full-screen over the shell
+      builder: (context, state) => const RegisterPage(),
+    ),
+    GoRoute(
+      path: '/login',
+      parentNavigatorKey:
+          _rootNavigatorKey, // Forces it to open full-screen over the shell
+      builder: (context, state) => const LogInPage(),
     ),
   ],
 );

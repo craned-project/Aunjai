@@ -32,25 +32,22 @@ class _MessageState extends State<Message> {
   // Tracks which tab is selected: 0 = SMS, 1 = แชท, 2 = Email
   int _selectedTabIndex = 0;
 
-  MessageType packageMessage() {
+  void analyzeMessage() {
     final List<String> msgList = _controllers
       .map((controller) => controller.text.trim()) // Get text and trim extra whitespace
       .where((text) => text.isNotEmpty)            // Optional: Filter out empty boxes if you want
       .toList();
     
-    return MessageType(_selectedTabIndex, msgList);
-  }
 
-  void analyzeMessage() {
-    MessageType msg = packageMessage();
-    if (msg.msglist.isEmpty) {
+    Map<String, dynamic> msg = {'method': _selectedTabIndex, 'msglist': msgList};
+    if (msg['msglist'].isEmpty) {
       print("Please type a message first!");
       return;
     }
 
     // 3. Print or pass it to your backend API / AI processing logic
-    print("Packaged Message Method: ${msg.method}");
-    print("Packaged Message Strings: ${msg.msglist}");
+    print("Packaged Message Method: ${msg['method']}");
+    print("Packaged Message Strings: ${msg['msglist']}");
   }
 
   @override
