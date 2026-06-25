@@ -62,6 +62,7 @@ flutter:
     - assets/logo/blue.png
     - assets/logo/yellow.png
     - assets/logo/red.png
+    - assets/images/link.png
 
   fonts:
     - family: IBM # This is the name you will use in your Dart code

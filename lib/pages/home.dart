@@ -263,7 +263,6 @@ Widget _buildFeatureGrid(BuildContext context) {
       subtitle: "SMS / แชท / อีเมล",
       actionText: "อุ่นใจ Message",
       onTap: () {
-        // 🎯 Flawlessly moves to the sub-page while keeping the nav bar visible!
         context.go('/message');
       },
     ),
@@ -292,7 +291,9 @@ Widget _buildFeatureGrid(BuildContext context) {
       title: "Link",
       subtitle: "ตรวจเว็บอันตราย",
       actionText: "อุ่นใจ Net",
-      onTap: () {},
+      onTap: () {
+        context.go('/link');
+      },
     ),
   ];
 

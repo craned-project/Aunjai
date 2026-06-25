@@ -1,4 +1,5 @@
 import 'package:aunjai/pages/history.dart';
+import 'package:aunjai/pages/link.dart';
 import 'package:aunjai/pages/message.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +55,11 @@ final GoRouter _router = GoRouter(
           path: '/message',
           builder: (context, state) =>
               const Message(), // 👈 Your sub-page now stays inside the shell!
+        ),
+        GoRoute(
+          path: '/link',
+          builder: (context, state) =>
+              const LinkCheck(), // 👈 Your sub-page now stays inside the shell!
         ),
         GoRoute(
           path: '/notifications',
