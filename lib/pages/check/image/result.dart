@@ -10,9 +10,25 @@ class ImageCheckPage extends StatefulWidget {
 
 class _ImageCheckPageState extends State<ImageCheckPage> {
   // 🎯 ADJUSTABLE VARIABLES: Tweak these to change your bar values dynamically!
-  double aiGeneratedPercentage = 0.78; // 78%
-  double humanCreatedPercentage = 0.62; // 62%
+  double aiGeneratedPercentage = 0.40; 
+  double humanCreatedPercentage = 0.60;
   int currentTabIdx = 0;
+
+  List<Color> barColor(double percentage, String mode) {
+    List<List<Color>> colorList = [
+      [Color(0xff22c55e), Color(0xff22c55e)],
+      [Color(0xffeab308), Color(0xff713f12)],
+      [const Color(0xffef4444), const Color(0xffb91c1c)]
+    ];
+
+    if (percentage > 0.7) {
+      return mode == 'ai' ? colorList[2] : colorList[0];
+    } else if (percentage > 0.4) {
+      return colorList[1];
+    }
+
+    return mode == 'ai' ? colorList[0] : colorList[2];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,44 +105,6 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // File Upload Area Window Outline Dotted Frame Box
-                        Container(
-                          width: double.infinity,
-                          height: 130,
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xff111827,
-                            ).withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              style: BorderStyle
-                                  .solid, // Swap with dotted border packages if preferred
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.folder_open_outlined,
-                                color: Colors.white.withValues(alpha: 0.6),
-                                size: 36,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                "อัปโหลดภาพที่คุณสงสัย\n(เช่น สลิป, แชท, โปรฟีล์, เอกสาร)",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  fontSize: 12,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
                         // Mascot Center Header Frame Graphic
                         Center(
                           child: SizedBox(
@@ -164,7 +142,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 13,
+                              fontSize: 16,
                               height: 1.4,
                             ),
                           ),
@@ -175,7 +153,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                         const Text(
                           "ผลการประเมิน",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -187,10 +165,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                           label: "สร้างโดย AI",
                           icon: Icons.smart_toy,
                           percentage: aiGeneratedPercentage,
-                          barGradientColors: [
-                            const Color(0xffef4444),
-                            const Color(0xffb91c1c),
-                          ], // Red warning tracking
+                          barGradientColors: barColor(aiGeneratedPercentage, 'ai'),
                         ),
                         const SizedBox(height: 24),
 
@@ -199,10 +174,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                           label: "สร้างโดยมนุษย์",
                           icon: Icons.person,
                           percentage: humanCreatedPercentage,
-                          barGradientColors: [
-                            const Color(0xffa5f3fc),
-                            const Color(0xff6366f1),
-                          ], // Smooth cyan-purple flow
+                          barGradientColors: barColor(humanCreatedPercentage, 'human'),
                         ),
                         const SizedBox(height: 28),
 
@@ -217,7 +189,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Text(
-                            "- อุ่นใจไม่ได้มั่นใจ 100% นะครับ แต่จากภาพนี้มีสัญญาณหลายอย่างที่เข้าข่ายหลอกลวง\n- หากเป็นเรื่องเงินหรือข้อมูลส่วนตัว แนะนำให้หยุดและตรวจสอบเพิ่มเติมก่อนครับ",
+                            "- อุ่นใจไม่ได้มั่นใจ 100% นะครับ แต่เป็นเพียงการคาดเดาแนวโน้มเท่านั้น\n- หากเป็นเรื่องเงินหรือข้อมูลส่วนตัว แนะนำให้หยุดและตรวจสอบเพิ่มเติมก่อนครับ",
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 14,

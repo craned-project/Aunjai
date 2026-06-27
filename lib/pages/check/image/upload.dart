@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart'; // Needed for kIsWeb check
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
 import 'dart:io';
 
 class ImageUploadPage extends StatefulWidget {
@@ -171,6 +172,13 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
                                       print(
                                         "Uploading ${_selectedFiles.length} images...",
                                       );
+
+                                      for (int i = 0; i < _selectedFiles.length; i++) {
+                                        final file = _selectedFiles[i];
+                                        String displayTitle = p.basename(file.path);
+
+                                        print(displayTitle);
+                                      }
                                     }
                                   : null, // Keeps the button natively unclickable
                               style: ElevatedButton.styleFrom(
@@ -188,6 +196,25 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xff111827,
+                            ).withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text(
+                            "- อุ่นใจไม่ได้มั่นใจ 100% นะครับ แต่เป็นเพียงการคาดเดาแนวโน้มเท่านั้น\n- หากเป็นเรื่องเงินหรือข้อมูลส่วนตัว แนะนำให้หยุดและตรวจสอบเพิ่มเติมก่อนครับ",
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.7),
+                              fontSize: 14,
+                              height: 1.5,
                             ),
                           ),
                         ),
