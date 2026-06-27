@@ -273,7 +273,9 @@ Widget _buildFeatureGrid(BuildContext context) {
       title: "Image",
       subtitle: "ภาพหลอกลวง",
       actionText: "อุ่นใจ Image",
-      onTap: () {},
+      onTap: () {
+        context.go('/image/upload');
+      },
     ),
     FeatureItem(
       icon: Icons.assignment_outlined,

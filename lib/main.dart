@@ -1,90 +1,72 @@
-import 'package:aunjai/pages/history.dart';
-import 'package:aunjai/pages/link.dart';
+import 'package:aunjai/pages/check/image/upload.dart';
+import 'package:aunjai/pages/menu/history.dart';
+import 'package:aunjai/pages/check/image/result.dart';
+import 'package:aunjai/pages/check/link.dart';
 import 'package:aunjai/pages/login.dart';
-import 'package:aunjai/pages/message.dart';
+import 'package:aunjai/pages/check/message.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // 1. Define a Global Navigation Key to track app context state safely
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
+final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'shell',
+);
 
 final GoRouter _router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/home', // Start on the home screen
+  initialLocation: '/home',
   routes: [
-    // 1. The ShellRoute handles everything that REQUIRES the navbar wrapper
+    // 1. The ShellRoute wraps EVERYTHING except login/register so they share the exact same background & navbar layout
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) {
-        final String location = state.matchedLocation;
-
-        int currentIndex = -1; // Default to -1 (No tab highlighted!)
-
-        if (location == '/home') currentIndex = 0;
-        if (location == '/notifications') currentIndex = 1;
-        if (location == '/history') currentIndex = 2;
-        if (location == '/profile') currentIndex = 3;
-
+        // 🎯 Pass the active string path location down into the container frame
         return MainScreenHolder(
-          currentIndex: currentIndex,
-          onTabSelected: (index) {
-            switch (index) {
-              case 0:
-                context.go('/home');
-                break;
-              case 1:
-                context.go('/notifications');
-                break;
-              case 2:
-                context.go('/history');
-                break;
-              case 3:
-                context.go('/profile');
-                break;
-            }
-          },
+          currentLocation: state.matchedLocation,
           child: child,
         );
       },
       routes: [
-        // Sub-pages that keep the navigation bar visible
         GoRoute(path: '/home', builder: (context, state) => const HomePage()),
-        GoRoute(path: '/message', builder: (context, state) => const Message()),
-        GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
         GoRoute(
           path: '/notifications',
-          builder: (context, state) => const Center(
-            child: Text("แจ้งเตือน", style: TextStyle(fontSize: 24)),
-          ),
+          builder: (context, state) => Center(child: Text("Notification")),
         ),
-        GoRoute(
-          path: '/history',
-          builder: (context, state) => const Center(child: History()),
-        ),
+        GoRoute(path: '/history', builder: (context, state) => const History()),
         GoRoute(
           path: '/profile',
-          builder: (context, state) => const Center(
-            child: Text("โปรไฟล์", style: TextStyle(fontSize: 24)),
-          ),
+          builder: (context, state) => const Center(child: Text("Profile")),
         ),
+
+        // 🎯 These are now inside the shell layout, so they get the same navbar and background background,
+        // but because they aren't part of the main tabs, they will automatically deselect all icons!
+        GoRoute(path: '/message', builder: (context, state) => const Message()),
+        GoRoute(
+          path: '/image/upload',
+          builder: (context, state) => const ImageUploadPage(),
+        ),
+        GoRoute(
+          path: '/image/result',
+          builder: (context, state) => const ImageCheckPage(),
+        ),
+        GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
       ],
     ),
 
-    // 🎯 2. Placed OUTSIDE the ShellRoute so the navbar disappears completely!
+    // 2. Login & Register completely outside (different layouts entirely)
     GoRoute(
       path: '/register',
-      parentNavigatorKey:
-          _rootNavigatorKey, // Forces it to open full-screen over the shell
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const RegisterPage(),
     ),
     GoRoute(
       path: '/login',
-      parentNavigatorKey:
-          _rootNavigatorKey, // Forces it to open full-screen over the shell
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const LogInPage(),
     ),
   ],
@@ -111,8 +93,8 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xff080d1a),
+        fontFamily: 'IBM'
       ),
-      // Hook up your router configurations here ⚡
       routerConfig: _router,
     );
   }
@@ -123,106 +105,40 @@ class _MyAppState extends State<MyApp> {
 // ==========================================
 class MainScreenHolder extends StatelessWidget {
   final Widget child;
-  final int currentIndex;
-  final ValueChanged<int>
-  onTabSelected; // 👈 Callback to notify parent when tabs change
+  final String currentLocation;
 
   const MainScreenHolder({
     super.key,
     required this.child,
-    required this.currentIndex,
-    required this.onTabSelected,
+    required this.currentLocation,
   });
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.sizeOf(context).width;
-
     return Scaffold(
-      extendBody: true,
-      backgroundColor: const Color(0xff080d1a),
-      body: Stack(
-        children: [
-          // Top-Right Localized Circle Glow
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Container(
-              width: 180,
-              height: 180,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    const Color(0xff0ea5e9).withValues(alpha: 0.30),
-                    const Color(0xff0ea5e9).withValues(alpha: 0.15),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.5, 1.0],
-                ),
-              ),
-            ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xff091026), Color(0xff050814)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-
-          // Bottom Central Localized Circle Glow (Purple)
-          Positioned(
-            bottom: 0,
-            left: screenWidth / 2 - 200,
-            child: Container(
-              width: 400,
-              height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    const Color(0xffa855f7).withValues(alpha: 0.40),
-                    const Color(0xffa855f7).withValues(alpha: 0.10),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.5, 1.0],
-                ),
-              ),
-            ),
-          ),
-
-          // Reusable Content View
-          Positioned.fill(child: child),
-        ],
-      ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
-    );
-  }
-
-  Widget _buildNavItem(
-    BuildContext context,
-    IconData icon,
-    String label,
-    int index,
-  ) {
-    final bool isActive = currentIndex == index;
-    final Color itemColor = isActive
-        ? Color(0xff3E8BFF)
-        : Colors.white.withValues(alpha: 0.4);
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () =>
-          onTabSelected(index), // 👈 Send the clicked index up to the parent!
-      child: SizedBox(
-        width: 60,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
+        ),
+        child: Stack(
           children: [
-            Icon(icon, color: itemColor, size: 26),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: itemColor,
-                fontSize: 11,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              ),
+            // Your shared background glow designs live here globally...
+
+            // The active page content
+            Positioned.fill(child: child),
+
+            // Shared Bottom Nav Bar Layout Dock
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: _buildBottomNavigationBar(context),
             ),
           ],
         ),
@@ -231,76 +147,109 @@ class MainScreenHolder extends StatelessWidget {
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
-    final bottomPadding = MediaQuery.paddingOf(context).bottom;
-
-    return SizedBox(
-      height: 70 + bottomPadding,
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          ClipPath(
-            clipper: BottomNavClipper(),
-            child: Container(
-              width: double.infinity,
-              height: 58 + bottomPadding,
-              decoration: BoxDecoration(
-                color: const Color(0xff0d1527),
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.06),
-                    width: 1,
-                  ),
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        ClipPath(
+          clipper: BottomNavClipper(),
+          child: Container(
+            height: 70,
+            color: const Color(0xff0d152d),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // 🎯 Ensure this doesn't have an "|| currentLocation == '/message'" or a default true fallback!
+                _buildTabItem(
+                  context,
+                  icon: Icons.home_outlined,
+                  label: "หน้าหลัก",
+                  targetPath: '/home',
                 ),
-              ),
-              padding: EdgeInsets.only(bottom: bottomPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(context, Icons.home_outlined, "หน้าหลัก", 0),
-                  _buildNavItem(
-                    context,
-                    Icons.notifications_none,
-                    "แจ้งเตือน",
-                    1,
-                  ),
-                  const SizedBox(width: 68),
-                  _buildNavItem(context, Icons.access_time, "ประวัติ", 2),
-                  _buildNavItem(context, Icons.person_outline, "โปรไฟล์", 3),
-                ],
-              ),
+                _buildTabItem(
+                  context,
+                  icon: Icons.notifications_none_outlined,
+                  label: "แจ้งเตือน",
+                  targetPath: '/notifications',
+                ),
+
+                const SizedBox(width: 48), // Space for floating button
+
+                _buildTabItem(
+                  context,
+                  icon: Icons.access_time,
+                  label: "ประวัติ",
+                  targetPath: '/history',
+                ),
+                _buildTabItem(
+                  context,
+                  icon: Icons.person_outline,
+                  label: "โปรไฟล์",
+                  targetPath: '/profile',
+                ),
+              ],
             ),
           ),
-          Positioned(
-            bottom: bottomPadding + 8,
-            child: GestureDetector(
-              onTap: () => print("Shield clicked!"),
-              child: Container(
-                width: 58,
-                height: 58,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xff4d3bf2), Color(0xff3124a8)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xff4d3bf2).withValues(alpha: 0.35),
-                      blurRadius: 14,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    width: 1.5,
-                  ),
-                ),
-                child: const Center(
-                  child: Icon(Icons.shield, color: Colors.white, size: 26),
+        ),
+        // Floating Shield Middle Button
+        Positioned(
+          top: 0,
+          child: GestureDetector(
+            onTap: () =>
+                context.go('/image'), // Example target path route execution
+            child: Container(
+              width: 56,
+              height: 56,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [Color(0xff4f46e5), Color(0xff3730a3)],
                 ),
               ),
+              child: const Icon(Icons.shield, color: Colors.white, size: 26),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String targetPath,
+  }) {
+    // 🎯 CRITICAL CONDITION: Directly matches current exact string path.
+    // If accessing sub-pages like /image or /message, this evaluates to false across all items,
+    // automatically dropping all highlights to unselected colors!
+    final bool isSelected = currentLocation == targetPath;
+
+    return GestureDetector(
+      onTap: () {
+        if (!isSelected) {
+          context.go(targetPath);
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            // Lights up when active, dims to 40% opacity when on sub-pages like /message
+            color: isSelected
+                ? Colors.blueAccent
+                : Colors.white.withValues(alpha: 0.4),
+            size: 28,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected
+                  ? Colors.blueAccent
+                  : Colors.white.withValues(alpha: 0.4),
+              fontSize: 14,
             ),
           ),
         ],
