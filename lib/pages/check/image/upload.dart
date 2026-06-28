@@ -210,7 +210,7 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Text(
-                            "- อุ่นใจไม่ได้มั่นใจ 100% นะครับ แต่เป็นเพียงการคาดเดาแนวโน้มเท่านั้น\n- หากเป็นเรื่องเงินหรือข้อมูลส่วนตัว แนะนำให้หยุดและตรวจสอบเพิ่มเติมก่อนครับ",
+                            "\u2022 อุ่นใจไม่ได้มั่นใจ 100% นะครับ แต่เป็นเพียงการคาดเดาแนวโน้มเท่านั้น\n\u2022 หากเป็นเรื่องเงินหรือข้อมูลส่วนตัว แนะนำให้หยุดและตรวจสอบเพิ่มเติมก่อนครับ",
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 14,

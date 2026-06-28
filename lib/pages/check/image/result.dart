@@ -10,7 +10,7 @@ class ImageCheckPage extends StatefulWidget {
 
 class _ImageCheckPageState extends State<ImageCheckPage> {
   // 🎯 ADJUSTABLE VARIABLES: Tweak these to change your bar values dynamically!
-  double aiGeneratedPercentage = 0.40; 
+  double aiGeneratedPercentage = 0.40;
   double humanCreatedPercentage = 0.60;
   int currentTabIdx = 0;
 
@@ -18,7 +18,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
     List<List<Color>> colorList = [
       [Color(0xff22c55e), Color(0xff22c55e)],
       [Color(0xffeab308), Color(0xff713f12)],
-      [const Color(0xffef4444), const Color(0xffb91c1c)]
+      [const Color(0xffef4444), const Color(0xffb91c1c)],
     ];
 
     if (percentage > 0.7) {
@@ -29,6 +29,8 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
 
     return mode == 'ai' ? colorList[0] : colorList[2];
   }
+
+  List<String> desc = ["this is kinda dangerous", "plz do not trust this frfr"];
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +127,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                         const SizedBox(height: 16),
 
                         // Notification Sub-heading Dialog Banner
-                        Container(
+                        /*Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -147,7 +149,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 28),*/
 
                         // Metrics Section Headings Label
                         const Text(
@@ -165,7 +167,10 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                           label: "สร้างโดย AI",
                           icon: Icons.smart_toy,
                           percentage: aiGeneratedPercentage,
-                          barGradientColors: barColor(aiGeneratedPercentage, 'ai'),
+                          barGradientColors: barColor(
+                            aiGeneratedPercentage,
+                            'ai',
+                          ),
                         ),
                         const SizedBox(height: 24),
 
@@ -174,7 +179,10 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                           label: "สร้างโดยมนุษย์",
                           icon: Icons.person,
                           percentage: humanCreatedPercentage,
-                          barGradientColors: barColor(humanCreatedPercentage, 'human'),
+                          barGradientColors: barColor(
+                            humanCreatedPercentage,
+                            'human',
+                          ),
                         ),
                         const SizedBox(height: 28),
 
@@ -188,14 +196,46 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                             ).withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: Text(
-                            "- อุ่นใจไม่ได้มั่นใจ 100% นะครับ แต่เป็นเพียงการคาดเดาแนวโน้มเท่านั้น\n- หากเป็นเรื่องเงินหรือข้อมูลส่วนตัว แนะนำให้หยุดและตรวจสอบเพิ่มเติมก่อนครับ",
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontSize: 14,
-                              height: 1.5,
-                            ),
-                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "คำแนะนำของอุ่นใจนะครับ",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.55,
+                                ),
+                              ),
+                              Column(
+                                children: desc?.map((description) {
+                                  return Row(
+                                    children: [
+                                      Text(
+                                        "\u2022 ",
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.7),
+                                          fontSize: 20,
+                                          height: 1.55,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          description,
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.7),
+                                            fontSize: 16,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ], 
+                                  );
+                                }).toList() ?? const [],
+                              ),
+                            ],
+                          )
                         ),
                       ],
                     ),
