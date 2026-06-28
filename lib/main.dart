@@ -1,4 +1,5 @@
 import 'package:aunjai/pages/check/image/upload.dart';
+import 'package:aunjai/pages/check/result.dart';
 import 'package:aunjai/pages/menu/history.dart';
 import 'package:aunjai/pages/check/image/result.dart';
 import 'package:aunjai/pages/check/link.dart';
@@ -33,28 +34,17 @@ final GoRouter _router = GoRouter(
       },
       routes: [
         GoRoute(path: '/home', builder: (context, state) => const HomePage()),
-        GoRoute(
-          path: '/notifications',
-          builder: (context, state) => Center(child: Text("Notification")),
-        ),
+        GoRoute(path: '/notifications', builder: (context, state) => Center(child: Text("Notification"))),
         GoRoute(path: '/history', builder: (context, state) => const History()),
-        GoRoute(
-          path: '/profile',
-          builder: (context, state) => const Center(child: Text("Profile")),
-        ),
+        GoRoute(path: '/profile', builder: (context, state) => const Center(child: Text("Profile"))),
 
         // 🎯 These are now inside the shell layout, so they get the same navbar and background background,
         // but because they aren't part of the main tabs, they will automatically deselect all icons!
         GoRoute(path: '/message', builder: (context, state) => const Message()),
-        GoRoute(
-          path: '/image/upload',
-          builder: (context, state) => const ImageUploadPage(),
-        ),
-        GoRoute(
-          path: '/image/result',
-          builder: (context, state) => const ImageCheckPage(),
-        ),
+        GoRoute(path: '/image/upload', builder: (context, state) => const ImageUploadPage()),
+        GoRoute(path: '/image/result', builder: (context, state) => const ImageCheckPage()),
         GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
+        GoRoute(path: '/result', builder: (context, state) => const ResultPage()),
       ],
     ),
 
