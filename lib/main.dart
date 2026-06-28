@@ -137,70 +137,97 @@ class MainScreenHolder extends StatelessWidget {
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        ClipPath(
-          clipper: BottomNavClipper(),
-          child: Container(
-            height: 70,
-            color: const Color(0xff0d152d),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // 🎯 Ensure this doesn't have an "|| currentLocation == '/message'" or a default true fallback!
-                _buildTabItem(
-                  context,
-                  icon: Icons.home_outlined,
-                  label: "หน้าหลัก",
-                  targetPath: '/home',
-                ),
-                _buildTabItem(
-                  context,
-                  icon: Icons.notifications_none_outlined,
-                  label: "แจ้งเตือน",
-                  targetPath: '/notifications',
-                ),
+    const pageBackground = Color(0xff091026); // Background color of your page gradient container
+    const navBarBackground = Color(0xff0d152d); // Dark navigation bar color
 
-                const SizedBox(width: 48), // Space for floating button
-
-                _buildTabItem(
-                  context,
-                  icon: Icons.access_time,
-                  label: "ประวัติ",
-                  targetPath: '/history',
-                ),
-                _buildTabItem(
-                  context,
-                  icon: Icons.person_outline,
-                  label: "โปรไฟล์",
-                  targetPath: '/profile',
-                ),
-              ],
-            ),
-          ),
-        ),
-        // Floating Shield Middle Button
-        Positioned(
-          top: 0,
-          child: GestureDetector(
-            onTap: () =>
-                context.go('/image'), // Example target path route execution
+    return Container(
+      height: 76, // 🎯 Reduced overall wrapper height to pull the button down
+      color: Colors.transparent, 
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: [
+          // 1. The Main Solid Navigation Bar Row
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
             child: Container(
-              width: 56,
-              height: 56,
+              height: 64,
               decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [Color(0xff4f46e5), Color(0xff3730a3)],
+                color: navBarBackground,
+                border: Border(
+                  top: BorderSide(color: Colors.white10),
                 ),
               ),
-              child: const Icon(Icons.shield, color: Colors.white, size: 26),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildTabItem(
+                    context,
+                    icon: Icons.home_outlined,
+                    label: "หน้าหลัก",
+                    targetPath: '/home',
+                  ),
+                  _buildTabItem(
+                    context,
+                    icon: Icons.notifications_none_outlined,
+                    label: "แจ้งเตือน",
+                    targetPath: '/notifications',
+                  ),
+
+                  const SizedBox(width: 56), // Matches the shield layout span cleanly
+
+                  _buildTabItem(
+                    context,
+                    icon: Icons.access_time,
+                    label: "ประวัติ",
+                    targetPath: '/history',
+                  ),
+                  _buildTabItem(
+                    context,
+                    icon: Icons.person_outline,
+                    label: "โปรไฟล์",
+                    targetPath: '/profile',
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+
+          // 2. The Overlapping Shield Button (Shifted down)
+          Positioned(
+            top: 4, // 🎯 Shifted down from 0 to eliminate that empty gap look
+            child: GestureDetector(
+              onTap: () => context.go('/image/upload'), //
+              child: Container(
+                width: 64, // Matches original specifications
+                height: 64, //
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: pageBackground, 
+                    width: 4,
+                  ),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xff2563eb), Color(0xff7c3aed)], //
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xff7c3aed).withValues(alpha: 0.25),
+                      blurRadius: 10,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.shield, color: Colors.white, size: 24),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -221,36 +248,38 @@ class MainScreenHolder extends StatelessWidget {
           context.go(targetPath);
         }
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            // Lights up when active, dims to 40% opacity when on sub-pages like /message
-            color: isSelected
-                ? Colors.blueAccent
-                : Colors.white.withValues(alpha: 0.4),
-            size: 28,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
+      child: Container(
+        constraints: const BoxConstraints(
+          minWidth: 50
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              // Lights up when active, dims to 40% opacity when on sub-pages like /message
               color: isSelected
                   ? Colors.blueAccent
                   : Colors.white.withValues(alpha: 0.4),
-              fontSize: 14,
+              size: 28,
             ),
-          ),
-        ],
-      ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? Colors.blueAccent
+                    : Colors.white.withValues(alpha: 0.4),
+                fontSize: 14,
+              ),
+            ),
+          ],
+        )
+      )
     );
   }
 }
 
-// ==========================================
-// 3. DATA MODELS & CLIPPERS
-// ==========================================
 class FeatureItem {
   final IconData icon;
   final Color iconColor;
@@ -269,40 +298,4 @@ class FeatureItem {
     required this.actionText,
     required this.onTap,
   });
-}
-
-class BottomNavClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    double cutoutRadius = 42.0;
-    double center = size.width / 2;
-
-    path.lineTo(center - cutoutRadius - 10, 0);
-    path.quadraticBezierTo(
-      center - cutoutRadius,
-      0,
-      center - cutoutRadius + 5,
-      12,
-    );
-    path.arcToPoint(
-      Offset(center + cutoutRadius - 5, 12),
-      radius: Radius.circular(cutoutRadius),
-      clockwise: false,
-    );
-    path.quadraticBezierTo(
-      center + cutoutRadius,
-      0,
-      center + cutoutRadius + 10,
-      0,
-    );
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
