@@ -16,7 +16,6 @@ class _ResetPWPageState extends State<ResetPWPage> {
   // 🎯 ADDED: Separate controller for the confirmation/verification field
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-  bool _rememberMe = false;
   bool _obscurePassword = true;
   bool _isFormInputValid = false; // Tracks if the complete form criteria is met
   bool _doPasswordsMatch = false; // 🎯 ADDED: Tracks password alignment states
@@ -283,7 +282,6 @@ class _ResetPWPageState extends State<ResetPWPage> {
                                       final Map<String, dynamic> payload = {
                                         'emailoruser': _emailOrUsernameController.text.trim(),
                                         'password': _passwordController.text,
-                                        'remember_me': _rememberMe
                                       };
 
                                       print("Ready to send packed object: $payload");
