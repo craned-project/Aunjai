@@ -1,12 +1,13 @@
 import 'package:aunjai/pages/check/image/upload.dart';
 import 'package:aunjai/pages/check/result.dart';
+import 'package:aunjai/pages/login/resetpw.dart';
 import 'package:aunjai/pages/menu/history.dart';
 import 'package:aunjai/pages/check/image/result.dart';
 import 'package:aunjai/pages/check/link.dart';
-import 'package:aunjai/pages/login.dart';
+import 'package:aunjai/pages/login/login.dart';
 import 'package:aunjai/pages/check/message.dart';
 import 'package:aunjai/pages/home.dart';
-import 'package:aunjai/pages/register.dart';
+import 'package:aunjai/pages/login/register.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -49,16 +50,9 @@ final GoRouter _router = GoRouter(
     ),
 
     // 2. Login & Register completely outside (different layouts entirely)
-    GoRoute(
-      path: '/register',
-      parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const RegisterPage(),
-    ),
-    GoRoute(
-      path: '/login',
-      parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const LogInPage(),
-    ),
+    GoRoute(path: '/register', parentNavigatorKey: _rootNavigatorKey, builder: (context, state) => const RegisterPage()),
+    GoRoute(path: '/login', parentNavigatorKey: _rootNavigatorKey, builder: (context, state) => const LogInPage()),
+    GoRoute(path: '/resetpw', parentNavigatorKey: _rootNavigatorKey, builder: (context, state) => const ResetPWPage()),
   ],
 );
 
