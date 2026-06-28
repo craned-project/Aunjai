@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path/path.dart';
 
 class Status {
   final String status;
@@ -9,13 +10,13 @@ class Status {
   const Status({
     required this.status,
     required this.textColor,
-    required this.bgColor
+    required this.bgColor,
   });
 }
 
 class HistoryItem {
   final String title;
-  final String timestamp;
+  final int timestamp;
   final int type;
   final int status;
 
@@ -23,7 +24,7 @@ class HistoryItem {
     required this.title,
     required this.timestamp,
     required this.type,
-    required this.status
+    required this.status,
   });
 }
 
@@ -39,65 +40,95 @@ class _HistoryState extends State<History> {
   // 0 = safe, 1 = sus, 2 = danger!
   int _activeFilterIndex = 0;
   final List<Status> status = [
-    Status(status: "ปลอดภัย", textColor: Color(0xff22c55e), bgColor: Color(0xff22c55e)),
-    Status(status: "น่าสงสัย", textColor: Color(0xffeab308), bgColor: Color(0xff713f12)),
-    Status(status: "อันตราย", textColor: Color(0xffef4444), bgColor: Color(0xff7f1d1d))
+    Status(
+      status: "ปลอดภัย",
+      textColor: Color(0xff22c55e),
+      bgColor: Color(0xff22c55e),
+    ),
+    Status(
+      status: "น่าสงสัย",
+      textColor: Color(0xffeab308),
+      bgColor: Color(0xff713f12),
+    ),
+    Status(
+      status: "อันตราย",
+      textColor: Color(0xffef4444),
+      bgColor: Color(0xff7f1d1d),
+    ),
   ];
 
-  final List<IconData> iconType = [
-    Icons.grid_view,
-    Icons.chat_bubble_outline,
-    Icons.phone,
-    Icons.link,
-    Icons.image,
+  List<({int type, IconData icon, String tag})> typeList = [
+    (type: 0, icon: Icons.grid_view, tag: "ทั้งหมด"),
+    (type: 1, icon: Icons.chat_bubble, tag: "ข้อความ"),
+    (type: 2, icon: Icons.phone, tag: "เบอร์โทร"),
+    (type: 3, icon: Icons.link, tag: "ลิงก์"),
+    (type: 4, icon: Icons.image, tag: "รูปภาพ"),
   ];
 
   List<HistoryItem> get _filteredHistoryItems {
-  if (_activeFilterIndex == 0) {
-    return _allHistoryItems; // "ทั้งหมด" -> Show everything
-  }
-  
-  return _allHistoryItems.where((item) {
-    switch (_activeFilterIndex) {
-      case 1: // "ข้อความ"
-        return iconType[item.type] == Icons.chat_bubble_outline;
-      case 2: // "tel"
-        return iconType[item.type] == Icons.phone;
-      case 3: // "ลิงก์"
-        return iconType[item.type] == Icons.link;
-      case 4: // "ภาพ"
-        return iconType[item.type] == Icons.image;
-      default:
-        return true;
+    if (_activeFilterIndex == 0) {
+      return _allHistoryItems; // "ทั้งหมด" -> Show everything
     }
-  }).toList();
-}
+
+    return _allHistoryItems.where((item) {
+      return item.type == _activeFilterIndex;
+    }).toList();
+  }
+
+  String formatUnixTimestamp(int unixTimeInSeconds) {
+    // Convert Unix timestamp to DateTime (expects milliseconds)
+    final date = DateTime.fromMillisecondsSinceEpoch(unixTimeInSeconds * 1000);
+    final now = DateTime.now();
+
+    // Create DateTime objects normalized to midnight (00:00:00) for accurate date comparison
+    final todayMidnight = DateTime(now.year, now.month, now.day);
+    final yesterdayMidnight = todayMidnight.subtract(const Duration(days: 1));
+    final targetMidnight = DateTime(date.year, date.month, date.day);
+
+    // Format hours and minutes to always be two digits (e.g., 05:09)
+    final String hh = date.hour.toString().padLeft(2, '0');
+    final String mm = date.minute.toString().padLeft(2, '0');
+
+    final List<String> monthTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+
+    if (targetMidnight == todayMidnight) {
+      return 'วันนี้ $hh:$mm';
+    } else if (targetMidnight == yesterdayMidnight) {
+      return 'เมื่อวาน $hh:$mm';
+    } else {
+      // Format as dd/mm/yyyy
+      final String day = date.day.toString().padLeft(2, '0');
+      final int month = date.month;
+      final String year = (date.year + 543).toString();
+      return '$day ${monthTH[month - 1]} $year';
+    }
+  }
 
   // Mock data matching your exact layout entries
   final List<HistoryItem> _allHistoryItems = [
     const HistoryItem(
       title: "SMS อ้างชื่อรับสิทธิ์เงินกู้",
-      timestamp: "วันนี้, 18:42 น.",
+      timestamp: 1782624319,
       type: 1,
-      status: 2
+      status: 2,
     ),
     const HistoryItem(
       title: "shopee-th-gift.com",
-      timestamp: "วานนี้, 14:15 น.",
+      timestamp: 1782424319,
       type: 3,
-      status: 1
+      status: 1,
     ),
     const HistoryItem(
       title: "สลิปธนาคารกสิกรไทย",
-      timestamp: "16 พ.ค. 2026",
+      timestamp: 1782512719,
       type: 4,
-      status: 0
+      status: 0,
     ),
     const HistoryItem(
       title: "เบอร์แปลก +66 81-XXX-XXXX",
-      timestamp: "14 พ.ค. 2026",
+      timestamp: 1782513319,
       type: 2,
-      status: 2
+      status: 2,
     ),
   ];
 
@@ -145,21 +176,17 @@ class _HistoryState extends State<History> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
-              children: [
-                _buildFilterPill("ทั้งหมด", Icons.grid_view_rounded, 0),
-                const SizedBox(width: 8),
-                _buildFilterPill("ข้อความ", Icons.chat, 1),
-                const SizedBox(width: 8),
-                _buildFilterPill("เบอร์โทร", Icons.phone, 2),
-                const SizedBox(width: 8),
-                _buildFilterPill("ลิงก์", Icons.link, 3),
-                const SizedBox(width: 8),
-                _buildFilterPill("ภาพ", Icons.image_outlined, 4),
-              ],
+              children: typeList.map((e) {
+                return Row(
+                  children: [
+                    _buildFilterPill(e.tag, e.icon, e.type),
+                    SizedBox(width: e.type == 4 ? 0 : 8),
+                  ],
+                );
+              }).toList(),
             ),
           ),
           const SizedBox(height: 24),
-
           // 2. Dynamic List of Checked History Cards
           Expanded(
             child: ListView.builder(
@@ -243,7 +270,11 @@ class _HistoryState extends State<History> {
               color: const Color(0xff1e293b).withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(iconType[item.type], color: Colors.white60, size: 20),
+            child: Icon(
+              typeList[item.type].icon,
+              color: Colors.white60,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 14),
 
@@ -264,7 +295,7 @@ class _HistoryState extends State<History> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  item.timestamp,
+                  formatUnixTimestamp(item.timestamp),
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.4),
                     fontSize: 12,
