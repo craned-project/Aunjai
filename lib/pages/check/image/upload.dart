@@ -279,7 +279,7 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
 
   Future<void> _pickImages() async {
     try {
-      final List<XFile>? images = await _picker.pickMultiImage(
+      final List<XFile> images = await _picker.pickMultiImage(
         maxWidth: 1920,
         maxHeight: 1080,
       );

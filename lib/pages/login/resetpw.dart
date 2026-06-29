@@ -361,7 +361,6 @@ class _ResetPWPageState extends State<ResetPWPage> {
     TextInputType keyboardType = TextInputType.text,
     Widget? suffixIcon,
     String? Function(String?)? validator,
-    Brightness? keyboardAppearance,
     ValueChanged<String>? onChanged,
   }) {
     return Container(

@@ -8,6 +8,7 @@ import 'package:aunjai/pages/login/login.dart';
 import 'package:aunjai/pages/check/message.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/login/register.dart';
+import 'package:aunjai/pages/menu/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -37,7 +38,7 @@ final GoRouter _router = GoRouter(
         GoRoute(path: '/home', builder: (context, state) => const HomePage()),
         GoRoute(path: '/notifications', builder: (context, state) => Center(child: Text("Notification"))),
         GoRoute(path: '/history', builder: (context, state) => const History()),
-        GoRoute(path: '/profile', builder: (context, state) => const Center(child: Text("Profile"))),
+        GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
 
         // 🎯 These are now inside the shell layout, so they get the same navbar and background background,
         // but because they aren't part of the main tabs, they will automatically deselect all icons!

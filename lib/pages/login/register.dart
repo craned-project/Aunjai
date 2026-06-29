@@ -59,7 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     // Both text fields must be valid AND the terms checkbox must be selected
-    bool _canSubmit = _hasAcceptedTerms && _isFormInputValid;
+    bool canSubmit = _hasAcceptedTerms && _isFormInputValid;
 
     return Scaffold(
       body: Container(
@@ -295,7 +295,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             gradient: LinearGradient(
-                              colors: _canSubmit
+                              colors: canSubmit
                                   ? [
                                       const Color(0xff2563eb),
                                       const Color(0xff7c3aed),
@@ -311,7 +311,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                             ),
-                            boxShadow: _canSubmit
+                            boxShadow: canSubmit
                                 ? [
                                     BoxShadow(
                                       color: const Color(
@@ -331,7 +331,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            onPressed: _canSubmit
+                            onPressed: canSubmit
                                 ? () {
                                     // 1. Trigger the standard form layout validation checks
                                     if (_formKey.currentState!.validate()) {
@@ -356,7 +356,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: _canSubmit
+                                color: canSubmit
                                     ? Colors.white
                                     : Colors.white.withValues(alpha: 0.24),
                               ),

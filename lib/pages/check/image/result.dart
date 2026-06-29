@@ -209,7 +209,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                                 ),
                               ),
                               Column(
-                                children: desc?.map((description) {
+                                children: desc.map((description) {
                                   return Row(
                                     children: [
                                       Text(
