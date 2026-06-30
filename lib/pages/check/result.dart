@@ -8,8 +8,6 @@ class ResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Sleek dark theme colors matching your design
     const scaffoldBg = Color(0xff091026);
-    const cardBg = Color(0xff111827);
-    const textMuted = Colors.white60;
 
     double dangerPercent = 0.45;
 

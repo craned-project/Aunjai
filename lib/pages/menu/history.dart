@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:aunjai/utils.dart';
 
 class Status {
   final String status;
@@ -72,35 +73,6 @@ class _HistoryState extends State<History> {
     return _allHistoryItems.where((item) {
       return item.type == _activeFilterIndex;
     }).toList();
-  }
-
-  String formatUnixTimestamp(int unixTimeInSeconds) {
-    // Convert Unix timestamp to DateTime (expects milliseconds)
-    final date = DateTime.fromMillisecondsSinceEpoch(unixTimeInSeconds * 1000);
-    final now = DateTime.now();
-
-    // Create DateTime objects normalized to midnight (00:00:00) for accurate date comparison
-    final todayMidnight = DateTime(now.year, now.month, now.day);
-    final yesterdayMidnight = todayMidnight.subtract(const Duration(days: 1));
-    final targetMidnight = DateTime(date.year, date.month, date.day);
-
-    // Format hours and minutes to always be two digits (e.g., 05:09)
-    final String hh = date.hour.toString().padLeft(2, '0');
-    final String mm = date.minute.toString().padLeft(2, '0');
-
-    final List<String> monthTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-
-    if (targetMidnight == todayMidnight) {
-      return 'วันนี้ $hh:$mm';
-    } else if (targetMidnight == yesterdayMidnight) {
-      return 'เมื่อวาน $hh:$mm';
-    } else {
-      // Format as dd/mm/yyyy
-      final String day = date.day.toString().padLeft(2, '0');
-      final int month = date.month;
-      final String year = (date.year + 543).toString();
-      return '$day ${monthTH[month - 1]} $year';
-    }
   }
 
   // Mock data matching your exact layout entries

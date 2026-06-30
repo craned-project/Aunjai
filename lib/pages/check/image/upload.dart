@@ -284,7 +284,7 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
         maxHeight: 1080,
       );
 
-      if (images != null && images.isNotEmpty) {
+      if (images.isNotEmpty) {
         setState(() {
           _pickedFiles = [..._pickedFiles, ...images]; // Appends new images
         });

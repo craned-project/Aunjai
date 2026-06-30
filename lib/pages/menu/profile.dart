@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:aunjai/utils.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -18,29 +20,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _profileImageUrl;
   bool _isShieldActive = true;
 
-  String maskEmail(String email) {
-    // 1. Split the email into local part and domain part
-    List<String> parts = email.split('@');
-    if (parts.length != 2)
-      return email; // Return original if it's not a valid format
-
-    String localPart = parts[0];
-    String domainPart = parts[1];
-
-    // 2. If the local part is 7 characters or less, don't obscure anything
-    if (localPart.length <= 7) {
-      return email;
-    }
-
-    // 3. Keep the first 7 characters
-    String visiblePart = localPart.substring(0, 7);
-
-    // 4. Create asterisks for the remaining characters up to the '@' symbol
-    String obscuredPart = '*' * (localPart.length - 7);
-
-    // 5. Combine everything back together
-    return '$visiblePart$obscuredPart@$domainPart';
-  }
 
   @override
   void initState() {
@@ -140,65 +119,77 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 20),
                             // Header Avatar
                             Center(
-                              child: Container(
-                                width: 110,
-                                height: 110,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(
-                                      0xff3b82f6,
-                                    ).withValues(alpha: 0.8),
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
+                              child: GestureDetector(
+                                onTap: () {
+                                  print(
+                                    "Profile picture circle tapped! Navigating to settings...",
+                                  );
+                                  // 🎯 Navigate to your settings route path cleanly using GoRouter
+                                  context.go('/settings');
+                                },
+                                child: Container(
+                                  width: 110,
+                                  height: 110,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
                                       color: const Color(
                                         0xff3b82f6,
-                                      ).withValues(alpha: 0.3),
-                                      blurRadius: 16,
+                                      ).withValues(alpha: 0.8),
+                                      width: 2,
                                     ),
-                                  ],
-                                ),
-                                child: ClipOval(
-                                  child: Container(
-                                    color: const Color(0xff111827),
-                                    // 🎯 Checks if there is a profile picture URL present
-                                    child:
-                                        _profileImageUrl != null &&
-                                            _profileImageUrl!.isNotEmpty
-                                        ? Image.network(
-                                            _profileImageUrl!,
-                                            fit: BoxFit.cover,
-                                            // Fallback icon placeholder if the image URL breaks or fails to load natively
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    const Icon(
-                                                      Icons.person,
-                                                      size: 55,
-                                                      color: Colors.white24,
-                                                    ),
-                                            loadingBuilder:
-                                                (
-                                                  context,
-                                                  child,
-                                                  loadingProgress,
-                                                ) {
-                                                  if (loadingProgress == null)
-                                                    return child;
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                        ),
-                                                  );
-                                                },
-                                          )
-                                        : const Icon(
-                                            Icons.person,
-                                            size: 55,
-                                            color: Colors.white24,
-                                          ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xff3b82f6,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 16,
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: Container(
+                                      color: const Color(0xff111827),
+                                      // 🎯 Checks if there is a profile picture URL present
+                                      child:
+                                          _profileImageUrl != null &&
+                                              _profileImageUrl!.isNotEmpty
+                                          ? Image.network(
+                                              _profileImageUrl!,
+                                              fit: BoxFit.cover,
+                                              // Fallback icon placeholder if the image URL breaks or fails to load natively
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) => const Icon(
+                                                    Icons.person,
+                                                    size: 55,
+                                                    color: Colors.white24,
+                                                  ),
+                                              loadingBuilder:
+                                                  (
+                                                    context,
+                                                    child,
+                                                    loadingProgress,
+                                                  ) {
+                                                    if (loadingProgress == null)
+                                                      return child;
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                          ),
+                                                    );
+                                                  },
+                                            )
+                                          : const Icon(
+                                              Icons.person,
+                                              size: 55,
+                                              color: Colors.white24,
+                                            ),
+                                    ),
                                   ),
                                 ),
                               ),

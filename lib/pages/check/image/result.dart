@@ -232,7 +232,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                                       ),
                                     ], 
                                   );
-                                }).toList() ?? const [],
+                                }).toList(),
                               ),
                             ],
                           )
