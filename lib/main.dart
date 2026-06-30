@@ -10,6 +10,7 @@ import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/login/register.dart';
 import 'package:aunjai/pages/menu/profile.dart';
 import 'package:aunjai/pages/menu/setting.dart';
+import 'package:aunjai/pages/report.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -49,6 +50,7 @@ final GoRouter _router = GoRouter(
         GoRoute(path: '/image/result', builder: (context, state) => const ImageCheckPage()),
         GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
         GoRoute(path: '/result', builder: (context, state) => const ResultPage()),
+         GoRoute(path: '/report', builder: (context, state) => const ReportPage()),
       ],
     ),
 

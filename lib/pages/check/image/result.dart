@@ -1,3 +1,4 @@
+import 'package:aunjai/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,24 +15,7 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
   double humanCreatedPercentage = 0.60;
   int currentTabIdx = 0;
 
-  List<Color> barColor(double percentage, String mode) {
-    List<List<Color>> colorList = [
-      [Color(0xff22c55e), Color(0xff22c55e)],
-      [Color(0xffeab308), Color(0xff713f12)],
-      [const Color(0xffef4444), const Color(0xffb91c1c)],
-    ];
-
-    if (percentage > 0.7) {
-      return mode == 'ai' ? colorList[2] : colorList[0];
-    } else if (percentage > 0.4) {
-      return colorList[1];
-    }
-
-    return mode == 'ai' ? colorList[0] : colorList[2];
-  }
-
   List<String> desc = ["this is kinda dangerous", "plz do not trust this frfr"];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,34 +50,46 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                 // Custom Navigation App Bar Header Row Layout
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
+                    horizontal: 16.0,
+                    vertical: 12.0,
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xff111827).withValues(alpha: 0.5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 20,
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => context.go('/image/upload'),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
                           ),
-                          onPressed: () {
-                            context.go('/image/upload');
-                          },
-                        ),
+                          const SizedBox(width: 16),
+                          const Text(
+                            "ผลการประเมิน",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      const Text(
-                        "อุ่นใจ Image",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      GestureDetector(
+                        onTap: () => {context.go('/report')},
+                        child: const Icon(
+                          Icons.report,
+                          color: Colors.redAccent,
+                          size: 28,
                         ),
                       ),
                     ],
@@ -215,7 +211,9 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                                       Text(
                                         "\u2022 ",
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.7),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.7,
+                                          ),
                                           fontSize: 20,
                                           height: 1.55,
                                         ),
@@ -224,18 +222,20 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                                         child: Text(
                                           description,
                                           style: TextStyle(
-                                            color: Colors.white.withValues(alpha: 0.7),
+                                            color: Colors.white.withValues(
+                                              alpha: 0.7,
+                                            ),
                                             fontSize: 16,
                                             height: 1.5,
                                           ),
                                         ),
                                       ),
-                                    ], 
+                                    ],
                                   );
                                 }).toList(),
                               ),
                             ],
-                          )
+                          ),
                         ),
                       ],
                     ),

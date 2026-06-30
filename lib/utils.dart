@@ -1,4 +1,5 @@
 //Utils Functions Lib
+import 'package:flutter/material.dart';
 
 //Mask Emails 
 String maskEmail(String email) {
@@ -68,5 +69,49 @@ String formatUnixTimestamp(int unixTimeInSeconds) {
     final int month = date.month;
     final String year = (date.year + 543).toString();
     return '$day ${monthTH[month - 1]} $year';
+  }
+}
+
+List<Color> colorList(int index) {
+  List<List<Color>> list = [
+    [Color(0xff22c55e), Color(0xff22c55e)],
+    [Color(0xffeab308), Color(0xff713f12)],
+    [const Color(0xfff97316), const Color.fromARGB(255, 165, 75, 11)],
+    [const Color(0xffef4444), const Color(0xffb91c1c)],
+  ];
+
+  return list[index];
+}
+
+List<Color> barColor(double percentage, String mode) {
+  int level;
+  if (percentage > 0.75) {
+    level = 3;
+  } else if (percentage > 0.50) {
+    level = 2;
+  } else if (percentage > 0.25) {
+    level = 1;
+  } else {
+    level = 0;
+  }
+
+  return mode == 'ai' ? colorList(level) : colorList(3 - level);
+}
+
+String dangerStatus(double percentage) {
+  if (percentage > 0.85) {
+    return "สูงมาก";
+  } else if (percentage > 0.75) {
+    return "สูง";
+  } else if (percentage > 0.60) {
+    return "ค่อนข้างสูง";
+  } else if (percentage > 0.40) {
+    return "ปานกลาง";
+  } else if (percentage > 0.25) {
+    return "ค่อนข้างต่ำ";
+  } else if (percentage > 0.10) {
+    return "ต่ำ";
+  } else {
+    return "ต่ำมาก";
   }
 }

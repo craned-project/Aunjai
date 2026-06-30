@@ -1,3 +1,4 @@
+import 'package:aunjai/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +10,7 @@ class ResultPage extends StatelessWidget {
     // Sleek dark theme colors matching your design
     const scaffoldBg = Color(0xff091026);
 
-    double dangerPercent = 0.45;
+    double dangerPercent = 0.52;
 
     return Scaffold(
       backgroundColor: scaffoldBg,
@@ -23,29 +24,42 @@ class ResultPage extends StatelessWidget {
                 vertical: 12.0,
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () => context.go('/home'),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
-                        shape: BoxShape.circle,
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => context.go('/home'),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 20,
+                      const SizedBox(width: 16),
+                      const Text(
+                        "ผลการประเมิน",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  const Text(
-                    "ผลการประเมิน",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: () => {context.go('/report')},
+                    child: const Icon(
+                        Icons.light,
+                        color: Colors.redAccent,
+                        size: 28,
                     ),
                   ),
                 ],
@@ -64,7 +78,11 @@ class ResultPage extends StatelessWidget {
                       child: SizedBox(
                         height: 150,
                         child: Image.asset(
-                          dangerPercent > 0.7 ? 'logo/red.png' : (dangerPercent > 0.4 ? 'logo/yellow.png' : 'logo/blue.png'), // Fallbacks safely to 🤖 if path structure changes
+                          dangerPercent > 0.7
+                              ? 'logo/red.png'
+                              : (dangerPercent > 0.4
+                                    ? 'logo/yellow.png'
+                                    : 'logo/blue.png'), // Fallbacks safely to 🤖 if path structure changes
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) =>
                               const Center(
@@ -168,22 +186,6 @@ class ResultPage extends StatelessWidget {
     required IconData icon,
     required double percentage,
   }) {
-    List<Color> barColor(double percentage, String mode) {
-      List<List<Color>> colorList = [
-        [Color(0xff22c55e), Color(0xff22c55e)],
-        [Color(0xffeab308), Color(0xff713f12)],
-        [const Color(0xffef4444), const Color(0xffb91c1c)],
-      ];
-
-      if (percentage > 0.7) {
-        return mode == 'ai' ? colorList[2] : colorList[0];
-      } else if (percentage > 0.4) {
-        return colorList[1];
-      }
-
-      return mode == 'ai' ? colorList[0] : colorList[2];
-    }
-
     return Column(
       children: [
         Row(
