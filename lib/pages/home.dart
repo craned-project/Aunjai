@@ -284,7 +284,9 @@ Widget _buildFeatureGrid(BuildContext context) {
       title: "Fake News",
       subtitle: "วิเคราะห์ข่าว",
       actionText: "อุ่นใจ News",
-      onTap: () {},
+      onTap: () {
+        context.go('/news');
+      },
     ),
     FeatureItem(
       icon: Icons.language,

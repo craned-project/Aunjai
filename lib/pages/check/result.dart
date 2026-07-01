@@ -10,7 +10,7 @@ class ResultPage extends StatelessWidget {
     // Sleek dark theme colors matching your design
     const scaffoldBg = Color(0xff091026);
 
-    double dangerPercent = 0.52;
+    double dangerPercent = 0.9;
 
     return Scaffold(
       backgroundColor: scaffoldBg,

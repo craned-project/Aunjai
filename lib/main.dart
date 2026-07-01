@@ -6,6 +6,7 @@ import 'package:aunjai/pages/check/image/result.dart';
 import 'package:aunjai/pages/check/link.dart';
 import 'package:aunjai/pages/login/login.dart';
 import 'package:aunjai/pages/check/message.dart';
+import 'package:aunjai/pages/check/news.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/login/register.dart';
 import 'package:aunjai/pages/menu/profile.dart';
@@ -50,7 +51,8 @@ final GoRouter _router = GoRouter(
         GoRoute(path: '/image/result', builder: (context, state) => const ImageCheckPage()),
         GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
         GoRoute(path: '/result', builder: (context, state) => const ResultPage()),
-         GoRoute(path: '/report', builder: (context, state) => const ReportPage()),
+        GoRoute(path: '/report', builder: (context, state) => const ReportPage()),
+        GoRoute(path: '/news', builder: (context, state) => const NewsCheck()),
       ],
     ),
 
