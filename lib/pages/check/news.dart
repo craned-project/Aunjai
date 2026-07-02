@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NewsCheck extends StatefulWidget {
   const NewsCheck({super.key});
@@ -10,11 +13,188 @@ class NewsCheck extends StatefulWidget {
 
 class _NewsCheckState extends State<NewsCheck> {
   final TextEditingController _newsController = TextEditingController();
+  
+  // Image Upload State Variables
+  final ImagePicker _picker = ImagePicker();
+  List<XFile> _pickedFiles = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
     _newsController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  // --- Image Upload Methods ---
+  Future<void> _pickImages() async {
+    try {
+      final List<XFile> images = await _picker.pickMultiImage(
+        maxWidth: 1920,
+        maxHeight: 1080,
+      );
+
+      if (images.isNotEmpty) {
+        setState(() {
+          _pickedFiles = [..._pickedFiles, ...images]; // Appends new images
+        });
+      }
+    } catch (e) {
+      print("Error picking images: $e");
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _pickedFiles.removeAt(index);
+    });
+  }
+
+  Widget _buildPlaceholderContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.folder_open_outlined,
+          color: Colors.white.withValues(alpha: 0.6),
+          size: 48,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          "อัปโหลดภาพที่คุณคิดว่าน่าสงสัย\n(สามารถอัพโหลดได้หลายรูปภาพ)",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.6),
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMultiImagePreview() {
+    return Column(
+      children: [
+        // 1. The Scrollable Images Stream Row
+        Expanded(
+          child: ListView.builder(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(12),
+            itemCount: _pickedFiles.length + 1,
+            itemBuilder: (context, index) {
+              if (index == _pickedFiles.length) {
+                return GestureDetector(
+                  onTap: _pickImages,
+                  child: Container(
+                    width: 100,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white54,
+                      size: 28,
+                    ),
+                  ),
+                );
+              }
+
+              final file = _pickedFiles[index];
+
+              return Stack(
+                children: [
+                  Container(
+                    width: 100,
+                    margin: const EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.black26,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: kIsWeb
+                          ? Image.network(file.path, fit: BoxFit.cover)
+                          : Image.file(File(file.path), fit: BoxFit.cover),
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 16,
+                    child: GestureDetector(
+                      onTap: () => _removeImage(index),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+
+        // 2. Custom Scroll Indicator Track
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
+          child: AnimatedBuilder(
+            animation: _scrollController,
+            builder: (context, child) {
+              double alignmentX = -1.0; 
+
+              if (_scrollController.hasClients) {
+                try {
+                  final maxScroll = _scrollController.position.maxScrollExtent;
+                  if (maxScroll > 0) {
+                    alignmentX = (_scrollController.offset / maxScroll * 2) - 1;
+                  }
+                } catch (_) {
+                  alignmentX = -1.0;
+                }
+              }
+
+              return Container(
+                width: 200, 
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Align(
+                  alignment: Alignment(
+                    alignmentX,
+                    0.0,
+                  ), 
+                  child: Container(
+                    width: 20,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -57,7 +237,7 @@ class _NewsCheckState extends State<NewsCheck> {
                 child: SizedBox(
                   height: 180,
                   child: Image.asset(
-                    'images/news.png', // 👈 Update to match your news mascot asset path
+                    'images/news.png',
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
@@ -148,37 +328,24 @@ class _NewsCheckState extends State<NewsCheck> {
               ),
               const SizedBox(height: 16),
 
-              // 6. Image Upload Button Area
-              GestureDetector(
-                onTap: () {
-                  // TODO: Implement image picking logic here (e.g., image_picker package)
-                  print("Open image picker");
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 32),
-                  decoration: BoxDecoration(
-                    color: const Color(0xff111827).withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(16),
-                    // Note: Use 'dotted_border' package if you want a true dashed line
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.2), style: BorderStyle.solid),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add, color: Colors.white.withValues(alpha: 0.5), size: 40),
-                      const SizedBox(height: 8),
-                      Text(
-                        "อัปโหลดภาพจากข่าวหรือโพสต์\n(ระบบจะไปตรวจด้วย AI ภาพ)",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5), 
-                          fontSize: 13,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
+              // 6. Image Upload Area (Updated)
+              Container(
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: const Color(0xff111827).withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: _pickedFiles.isEmpty
+                      ? GestureDetector(
+                          onTap: _pickImages,
+                          behavior: HitTestBehavior.opaque,
+                          child: _buildPlaceholderContent(),
+                        )
+                      : _buildMultiImagePreview(),
                 ),
               ),
               const SizedBox(height: 48),
@@ -211,7 +378,7 @@ class _NewsCheckState extends State<NewsCheck> {
                   onPressed: () {
                     final String newsContent = _newsController.text.trim();
                     print("Sending News for verification: $newsContent");
-                    // TODO: Pass both text and the selected image to your API
+                    print("Total Images Attached: ${_pickedFiles.length}");
                   },
                   child: const Text(
                     "ตรวจสอบข่าวนี้",
