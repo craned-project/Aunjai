@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
             ),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                _buildAssistantBanner(),
+                _buildAssistantBanner(context), // 🎯 ส่ง context เข้ามาที่นี่
                 const SizedBox(height: 16),
                 _buildInsightBanner(),
                 const SizedBox(height: 20),
@@ -138,7 +138,8 @@ Widget _buildHeader() {
   );
 }
 
-Widget _buildAssistantBanner() {
+// 🎯 เพิ่ม BuildContext context ในวงเล็บนี้ เพื่อให้รู้จักคำสั่ง context.go
+Widget _buildAssistantBanner(BuildContext context) {
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.all(16),
@@ -193,7 +194,9 @@ Widget _buildAssistantBanner() {
         ),
         const SizedBox(height: 4),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            context.go('/call'); // 🎯 แก้ error สำเร็จ
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,

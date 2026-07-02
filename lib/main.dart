@@ -7,6 +7,7 @@ import 'package:aunjai/pages/check/link.dart';
 import 'package:aunjai/pages/login/login.dart';
 import 'package:aunjai/pages/check/message.dart';
 import 'package:aunjai/pages/check/news.dart';
+import 'package:aunjai/pages/check/CallMode.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/login/register.dart';
 import 'package:aunjai/pages/menu/profile.dart';
@@ -47,6 +48,7 @@ final GoRouter _router = GoRouter(
         // 🎯 These are now inside the shell layout, so they get the same navbar and background background,
         // but because they aren't part of the main tabs, they will automatically deselect all icons!
         GoRoute(path: '/message', builder: (context, state) => const Message()),
+        GoRoute(path: '/call', builder: (context, state) => const CallMode()),
         GoRoute(path: '/image/upload', builder: (context, state) => const ImageUploadPage()),
         GoRoute(path: '/image/result', builder: (context, state) => const ImageCheckPage()),
         GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
