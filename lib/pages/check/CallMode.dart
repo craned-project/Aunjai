@@ -160,7 +160,7 @@ class _CallModeState extends State<CallMode> {
           children: [
             Expanded(
               child: _buildGradientButton(
-                icon: "🚨",
+                icon: Icons.report,
                 text: "เริ่มน่าสงสัย",
                 colors: [const Color(0xfff59e0b), const Color(0xffd97706)],
               ),
@@ -168,7 +168,7 @@ class _CallModeState extends State<CallMode> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildGradientButton(
-                icon: "🔍",
+                icon: Icons.search,
                 text: "ช่วยฉันตรวจสอบ",
                 colors: [const Color(0xff06b6d4), const Color(0xff0891b2)],
               ),
@@ -194,11 +194,8 @@ class _CallModeState extends State<CallMode> {
                 "Risk Snapshot",
                 style: TextStyle(color: Color(0xfff59e0b), fontSize: 14, fontWeight: FontWeight.bold), 
               ),
-              const SizedBox(height: 8),
               _buildBulletText("ใช้คำเร่งด่วนผิดปกติ"),
-              const SizedBox(height: 4), 
               _buildBulletText("ขอข้อมูลส่วนตัวทันที"),
-              const SizedBox(height: 4),
               _buildBulletText("ไม่ยอมให้ตรวจสอบ"),
             ],
           ),
@@ -444,7 +441,7 @@ class _CallModeState extends State<CallMode> {
     );
   }
 
-  Widget _buildGradientButton({required String icon, required String text, required List<Color> colors}) {
+  Widget _buildGradientButton({required IconData icon, required String text, required List<Color> colors}) {
     return Container(
       height: 48,
       decoration: BoxDecoration(
@@ -464,9 +461,9 @@ class _CallModeState extends State<CallMode> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 16)),
+            Icon(icon, size: 20, color: Colors.white),
             const SizedBox(width: 8),
-            Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
           ],
         ),
       ),
@@ -476,8 +473,8 @@ class _CallModeState extends State<CallMode> {
   Widget _buildBulletText(String text) {
     return Row(
       children: [
-        const Text("• ", style: TextStyle(color: Color(0xfff59e0b), fontSize: 16)),
-        Text(text, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
+        const Text("• ", style: TextStyle(color: Color(0xfff59e0b), fontSize: 18)),
+        Text(text, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14)),
       ],
     );
   }

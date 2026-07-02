@@ -64,7 +64,7 @@ class ResultPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () => {context.go('/report')},
                     child: const Icon(
-                      Icons.light,
+                      Icons.report,
                       color: Colors.redAccent,
                       size: 28,
                     ),

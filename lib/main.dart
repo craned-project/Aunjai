@@ -7,7 +7,7 @@ import 'package:aunjai/pages/check/link.dart';
 import 'package:aunjai/pages/login/login.dart';
 import 'package:aunjai/pages/check/message.dart';
 import 'package:aunjai/pages/check/news.dart';
-import 'package:aunjai/pages/check/CallMode.dart';
+import 'package:aunjai/pages/check/callmode.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/login/register.dart';
 import 'package:aunjai/pages/menu/profile.dart';
@@ -202,7 +202,7 @@ class MainScreenHolder extends StatelessWidget {
           Positioned(
             top: 4, // 🎯 Shifted down from 0 to eliminate that empty gap look
             child: GestureDetector(
-              onTap: () => context.go('/image/upload'), //
+              onTap: () => context.go('/call'), //
               child: Container(
                 width: 64, // Matches original specifications
                 height: 64, //
