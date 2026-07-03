@@ -43,7 +43,7 @@ String formatRelativeTime(int unixTimestampInSeconds) {
 }
 
 //Format Time
-String formatUnixTimestamp(int unixTimeInSeconds) {
+String formatUnixTimestamp(int unixTimeInSeconds, bool alwaysShowTime) {
   // Convert Unix timestamp to DateTime (expects milliseconds)
   final date = DateTime.fromMillisecondsSinceEpoch(unixTimeInSeconds * 1000);
   final now = DateTime.now();
@@ -68,7 +68,11 @@ String formatUnixTimestamp(int unixTimeInSeconds) {
     final String day = date.day.toString().padLeft(2, '0');
     final int month = date.month;
     final String year = (date.year + 543).toString();
-    return '$day ${monthTH[month - 1]} $year';
+    if (alwaysShowTime) {
+      return '$day ${monthTH[month - 1]} $year $hh:$mm';
+    } else {
+      return '$day ${monthTH[month - 1]} $year';
+    }
   }
 }
 

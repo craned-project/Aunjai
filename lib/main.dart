@@ -10,6 +10,7 @@ import 'package:aunjai/pages/check/news.dart';
 import 'package:aunjai/pages/check/callmode.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/login/register.dart';
+import 'package:aunjai/pages/menu/notification.dart';
 import 'package:aunjai/pages/menu/profile.dart';
 import 'package:aunjai/pages/menu/setting.dart';
 import 'package:aunjai/pages/report.dart';
@@ -40,7 +41,7 @@ final GoRouter _router = GoRouter(
       },
       routes: [
         GoRoute(path: '/home', builder: (context, state) => const HomePage()),
-        GoRoute(path: '/notifications', builder: (context, state) => Center(child: Text("Notification"))),
+        GoRoute(path: '/notifications', builder: (context, state) => NotificationPage()),
         GoRoute(path: '/history', builder: (context, state) => const History()),
         GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
         GoRoute(path: '/settings', builder: (context, state) => const SettingsPage()),
