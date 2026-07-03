@@ -9,6 +9,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String username = "ธีระวิทย์";
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> {
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: _buildHeader(), // Your custom flush header widget
+            child: _buildHeader(username), // Your custom flush header widget
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(
@@ -54,9 +56,9 @@ class _HomePageState extends State<HomePage> {
 }
 
 // --- UI Layout Sub-builders ---
-Widget _buildHeader() {
+Widget _buildHeader(String username) {
   // Get the height of the device's status bar area dynamically
-  String username = "ธีระวิทย์";
+
   return Container(
     // Internal padding shifts text comfortably away from screen edges and the status bar
     padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 16.0, bottom: 0),
