@@ -266,7 +266,7 @@ class _HistoryState extends State<History> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  formatUnixTimestamp(item.timestamp),
+                  formatUnixTimestamp(item.timestamp, false),
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.4),
                     fontSize: 12,
