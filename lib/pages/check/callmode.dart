@@ -17,7 +17,7 @@ class CallMode extends StatefulWidget {
 
 class _CallModeState extends State<CallMode> {
   // ⚙️ Change this value to switch between different screens!
-  CallUIState _uiState = CallUIState.initial; 
+  CallUIState _uiState = CallUIState.textAnswer; 
 
   final TextEditingController _chatController = TextEditingController();
   final TextEditingController _answerController = TextEditingController();

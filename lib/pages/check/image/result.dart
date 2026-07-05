@@ -11,11 +11,11 @@ class ImageCheckPage extends StatefulWidget {
 
 class _ImageCheckPageState extends State<ImageCheckPage> {
   // 🎯 ADJUSTABLE VARIABLES: Tweak these to change your bar values dynamically!
-  double aiGeneratedPercentage = 0.40;
-  double humanCreatedPercentage = 0.60;
+  double aiGeneratedPercentage = 0.70;
+  double humanCreatedPercentage = 0.30;
   int currentTabIdx = 0;
 
-  List<String> desc = ["this is kinda dangerous", "plz do not trust this frfr"];
+  List<String> desc = ["รูปภาพนี้มีแนวโน้มที่จะเป็น scam สูงครับ", "โปรดอย่าหลงเชื่อหรือทำตามรูปภาพดังกล่าวนะครับ"];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
