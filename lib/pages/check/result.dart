@@ -12,7 +12,7 @@ class ResultPage extends StatelessWidget {
 
     // 1. คะแนนจากทั้ง 3 เกณฑ์การประเมิน
     const int actionScore = 75;
-    const int identityScore = 35;
+    const int identityScore = 37;
     const int contextScore = 90;
 
     // 2. คำนวณคะแนนเฉลี่ยรวมอัตโนมัติ (คะแนนรวมกัน หารด้วย 3 และทำเป็นเปอร์เซ็นต์ 0.0 - 1.0)
