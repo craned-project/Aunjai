@@ -2,12 +2,12 @@ import 'package:aunjai/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class ResultPage extends StatefulWidget {
+class CallResultPage extends StatefulWidget {
   final double actionRisk;   // Value from 0.0 to 30.0
   final double identityRisk; // Value from 0.0 to 35.0
   final double contextRisk; // Value from 0.0 to 35.0
 
-  const ResultPage({
+  const CallResultPage({
     super.key,
     required this.actionRisk,
     required this.identityRisk,
@@ -15,10 +15,10 @@ class ResultPage extends StatefulWidget {
   });
 
   @override
-  State<ResultPage> createState() => _ResultPageState();
+  State<CallResultPage> createState() => _CallResultPageState();
 }
 
-class _ResultPageState extends State<ResultPage> {
+class _CallResultPageState extends State<CallResultPage> {
   @override
   Widget build(BuildContext context) {
     // Sleek dark theme colors matching your design
@@ -26,9 +26,9 @@ class _ResultPageState extends State<ResultPage> {
 
     final Map<String, double> riskData = GoRouterState.of(context).extra as Map<String, double>;
   
-    final double actionRisk = 0;
-    final double identityRisk = 0;
-    final double contextRisk = 0;
+    final double actionRisk = riskData['actionRisk'] ?? 0.0;
+    final double identityRisk = riskData['identityRisk'] ?? 0.0;
+    final double contextRisk = riskData['contextRisk'] ?? 0.0;
 
     // 2. คำนวณคะแนนเฉลี่ยรวมอัตโนมัติ (คะแนนรวมกัน หารด้วย 3 และทำเป็นเปอร์เซ็นต์ 0.0 - 1.0)
     double dangerPercent = (actionRisk + identityRisk + contextRisk) / 3;
