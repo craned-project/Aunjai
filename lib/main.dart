@@ -1,3 +1,4 @@
+import 'package:aunjai/pages/check/call/result.dart';
 import 'package:aunjai/pages/check/image/upload.dart';
 import 'package:aunjai/pages/check/result.dart';
 import 'package:aunjai/pages/login/resetpw.dart';
@@ -7,7 +8,7 @@ import 'package:aunjai/pages/check/link.dart';
 import 'package:aunjai/pages/login/login.dart';
 import 'package:aunjai/pages/check/message.dart';
 import 'package:aunjai/pages/check/news.dart';
-import 'package:aunjai/pages/check/callmode.dart';
+import 'package:aunjai/pages/check/call/questionaire.dart';
 import 'package:aunjai/pages/home.dart';
 import 'package:aunjai/pages/login/register.dart';
 import 'package:aunjai/pages/menu/notification.dart';
@@ -49,13 +50,38 @@ final GoRouter _router = GoRouter(
         // 🎯 These are now inside the shell layout, so they get the same navbar and background background,
         // but because they aren't part of the main tabs, they will automatically deselect all icons!
         GoRoute(path: '/message', builder: (context, state) => const Message()),
-        GoRoute(path: '/call', builder: (context, state) => const CallMode()),
+        GoRoute(path: '/call/questionaire', builder: (context, state) => const CallMode()),
+        GoRoute(
+          path: '/call/result', 
+          builder: (context, state) {
+            // Cast the extra parameter back into a Map
+            final risks = state.extra as Map<String, double>;
+            
+            return CallResultPage(
+              actionRisk: risks['actionRisk'] ?? 0.0,
+              identityRisk: risks['identityRisk'] ?? 0.0,
+              contextRisk: risks['contextRisk'] ?? 0.0
+            );
+          }
+        ),
         GoRoute(path: '/image/upload', builder: (context, state) => const ImageUploadPage()),
         GoRoute(path: '/image/result', builder: (context, state) => const ImageCheckPage()),
         GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
-        GoRoute(path: '/result', builder: (context, state) => const ResultPage()),
-        GoRoute(path: '/report', builder: (context, state) => const ReportPage()),
         GoRoute(path: '/news', builder: (context, state) => const NewsCheck()),
+        GoRoute(path: '/report', builder: (context, state) => const ReportPage()),
+        GoRoute(
+          path: '/result', 
+          builder: (context, state) {
+            // Cast the extra parameter back into a Map
+            final risks = state.extra as Map<String, double>;
+            
+            return ResultPage(
+              actionRisk: risks['actionRisk'] ?? 0.0,
+              identityRisk: risks['identityRisk'] ?? 0.0,
+              contextRisk: risks['contextRisk'] ?? 0.0
+            );
+          }
+        ),
       ],
     ),
 
@@ -203,7 +229,7 @@ class MainScreenHolder extends StatelessWidget {
           Positioned(
             top: 4, // 🎯 Shifted down from 0 to eliminate that empty gap look
             child: GestureDetector(
-              onTap: () => context.go('/call'), //
+              onTap: () => context.go('/call/questionaire'), //
               child: Container(
                 width: 64, // Matches original specifications
                 height: 64, //

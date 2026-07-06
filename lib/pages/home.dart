@@ -197,7 +197,7 @@ Widget _buildAssistantBanner(BuildContext context) {
         const SizedBox(height: 4),
         ElevatedButton(
           onPressed: () {
-            context.go('/call'); // 🎯 แก้ error สำเร็จ
+            context.go('/call/questionaire'); // 🎯 แก้ error สำเร็จ
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
