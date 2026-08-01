@@ -1,3 +1,4 @@
+import 'package:aunjai/provincelists.dart';
 import 'package:aunjai/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -19,9 +20,7 @@ class Evidence {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  // 🎯 Interactive Form State Elements
-  bool _isAnonymousSubmission = true;
-  String _selectedPlatform = 'LINE';
+  String _selectedPlatform = 'โทรศัพท์';
   String? _selectedRegion;
 
   List<double> scores = [0.85, 0.75, 0.20, 0.90];
@@ -36,25 +35,13 @@ class _ReportPageState extends State<ReportPage> {
   final TextEditingController _additionalDetailsController =
       TextEditingController();
 
-  // Accordion Expand/Collapse States
-  bool _isTextAnalysisExpanded = false;
-  bool _isQuickModeExpanded = false;
-  bool _isImageCheckExpanded = false;
-
   // Mock Dropdown Lists
   final List<String> _platforms = [
-    'LINE',
-    'Facebook',
-    'Messenger',
-    'Telegram',
-    'SMS / Call',
-  ];
-  final List<String> _regions = [
-    'กรุงเทพมหานคร',
-    'นนทบุรี',
-    'สมุทรปราการ',
-    'เชียงใหม่',
-    'ภูเก็ต',
+    'โทรศัพท์',
+    'แชท',
+    'โซเชียล',
+    'อีเมล',
+    'รูปภาพ',
   ];
 
   List<Evidence> evidences = [
@@ -244,35 +231,6 @@ class _ReportPageState extends State<ReportPage> {
                 ),
                 const SizedBox(height: 14),
 
-                // 🔹 SECTION 3: Deep Dive Investigation Accordions
-                _buildSectionHeader("รายละเอียดผลวิเคราะห์เชิงลึก"),
-                _buildExpansionTile(
-                  title: "การวิเคราะห์ข้อความ (Text Analysis)",
-                  isExpanded: _isTextAnalysisExpanded,
-                  onToggle: (val) =>
-                      setState(() => _isTextAnalysisExpanded = val),
-                  childContent:
-                      "รายละเอียดข้อมูลเชิงลึกระบุพบบัญชีคำศัพท์เสี่ยงรวมถึงแบล็คลิสต์ทางพาณิชย์...",
-                ),
-                const SizedBox(height: 12),
-                _buildExpansionTile(
-                  title: "การวิเคราะห์ Quick Mode",
-                  isExpanded: _isQuickModeExpanded,
-                  onToggle: (val) => setState(() => _isQuickModeExpanded = val),
-                  childContent:
-                      "การตรวจสอบด่วนเสร็จสิ้นภายใน 1.2 วินาที พบคอมโพเนนต์ความเสี่ยงภายนอก...",
-                ),
-                const SizedBox(height: 12),
-                _buildExpansionTile(
-                  title: "การวิเคราะห์ภาพ (Image Check)",
-                  isExpanded: _isImageCheckExpanded,
-                  onToggle: (val) =>
-                      setState(() => _isImageCheckExpanded = val),
-                  childContent:
-                      "ข้อมูล Metadata ของรูปภาพถูกแก้ไข และลายน้ำดิจิทัลตรงกับประวัติแคมเปญฟิชชิง...",
-                ),
-                const SizedBox(height: 28),
-
                 // 🔹 SECTION 4: Government Filing Intake Form
                 _buildSectionHeader("ข้อมูลและช่องทางการรายงาน"),
                 Container(
@@ -281,42 +239,8 @@ class _ReportPageState extends State<ReportPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Dual Action Toggle Row Switcher Buttons
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xff090f22),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _buildToggleSegment(
-                                "ส่งแบบไม่ระบุตัวตน",
-                                _isAnonymousSubmission,
-                                () {
-                                  setState(() => _isAnonymousSubmission = true);
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: _buildToggleSegment(
-                                "ส่งพร้อมข้อมูลติดต่อ",
-                                !_isAnonymousSubmission,
-                                () {
-                                  setState(
-                                    () => _isAnonymousSubmission = false,
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
                       // Platform Intake Dropdown
-                      _buildFormFieldLabel("ช่องทางที่พบภัยหลอกลวง"),
+                      _buildFormFieldLabel("ช่องทางที่พบภัยหลอกลวง", true),
                       _buildDropdownField<String>(
                         value: _selectedPlatform,
                         items: _platforms,
@@ -326,11 +250,11 @@ class _ReportPageState extends State<ReportPage> {
                       const SizedBox(height: 18),
 
                       // Region Intake Dropdown
-                      _buildFormFieldLabel("จังหวัดที่เกิดเหตุ"),
+                      _buildFormFieldLabel("จังหวัดที่เกิดเหตุ", false),
                       _buildDropdownField<String?>(
                         value: _selectedRegion,
                         hint: "เลือกจังหวัดของคุณ",
-                        items: _regions,
+                        items: Provinces,
                         onChanged: (val) =>
                             setState(() => _selectedRegion = val),
                       ),
@@ -338,7 +262,7 @@ class _ReportPageState extends State<ReportPage> {
 
                       // Text Field Area Input
                       _buildFormFieldLabel(
-                        "รายละเอียดข้อมูลที่อยู่ / ข้อมูลเพิ่มเติม",
+                        "รายละเอียดข้อมูลที่อยู่ / ข้อมูลเพิ่มเติม", false
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -431,7 +355,6 @@ class _ReportPageState extends State<ReportPage> {
                     ),
                     onPressed: () {
                       final Map<String, dynamic> reportData = {
-                        'is_anonymous': _isAnonymousSubmission,
                         'platform': _selectedPlatform,
                         'region': _selectedRegion,
                         'notes': _additionalDetailsController.text.trim(),
@@ -581,82 +504,32 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  Widget _buildExpansionTile({
-    required String title,
-    required bool isExpanded,
-    required ValueChanged<bool> onToggle,
-    required String childContent,
-  }) {
-    return Container(
-      decoration: _buildCardDecoration(),
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            trailing: Icon(
-              isExpanded ? Icons.remove : Icons.add,
-              color: Colors.white38,
-              size: 18,
-            ),
-            onTap: () => onToggle(!isExpanded),
-          ),
-          if (isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-              child: Text(
-                childContent,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.4),
-                  fontSize: 13,
-                  height: 1.4,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleSegment(String label, bool isActive, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: isActive ? const Color(0xff1d2c52) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isActive ? Colors.white : Colors.white38,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFormFieldLabel(String text) {
+  Widget _buildFormFieldLabel(String text, bool req) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, left: 2),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.4),
-          fontSize: 13,
-        ),
-      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.4),
+              fontSize: 14,
+            ),
+          ),
+          if (req) ...[
+            const SizedBox(width: 4),
+            Text(
+              "*จำเป็น",
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontSize: 12,
+                fontWeight: FontWeight(600)
+              ),
+            ),
+          ]
+        ],
+      )
     );
   }
 

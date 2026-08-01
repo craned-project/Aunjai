@@ -9,9 +9,9 @@ class ResultPage extends StatefulWidget {
 
   const ResultPage({
     super.key,
-    required this.actionRisk,
-    required this.identityRisk,
-    required this.contextRisk,
+    this.actionRisk = 0.0,
+    this.identityRisk = 0.0,
+    this.contextRisk = 0.0,
   });
 
   @override
@@ -23,12 +23,9 @@ class _ResultPageState extends State<ResultPage> {
   Widget build(BuildContext context) {
     // Sleek dark theme colors matching your design
     const scaffoldBg = Color(0xff091026);
-
-    final Map<String, double> riskData = GoRouterState.of(context).extra as Map<String, double>;
-  
-    final double actionRisk = 0;
-    final double identityRisk = 0;
-    final double contextRisk = 0;
+    final double actionRisk = 0.0;
+    final double identityRisk = 0.0;
+    final double contextRisk = 0.0;
 
     // 2. คำนวณคะแนนเฉลี่ยรวมอัตโนมัติ (คะแนนรวมกัน หารด้วย 3 และทำเป็นเปอร์เซ็นต์ 0.0 - 1.0)
     double dangerPercent = (actionRisk + identityRisk + contextRisk) / 3;
@@ -199,8 +196,10 @@ class _ResultPageState extends State<ResultPage> {
                       description:
                           "ตรวจพบการติดต่อที่ไม่มีความเชื่อมโยงกับพฤติกรรมในอดีตของผู้ใช้งาน หรือเป็นการอ้างอิงถึงเหตุการณ์ พัสดุ หรือคดีความที่ไม่มีที่มาที่ไป ซึ่งเป็นรูปแบบการสร้างสถานการณ์จำลองที่มิจฉาชีพมักใช้เพื่อเริ่มบทสนทนา",
                     ),
-                    
-                    const SizedBox(height: 120), 
+                    const SizedBox(height: 18),
+
+                    buildGradientButton(context, "รายงานผล", "/report"),
+                    const SizedBox(height: 120)
                   ],
                 ),
               ),
@@ -383,4 +382,44 @@ class _InsightCard extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget buildGradientButton(BuildContext context, String text, String link) {
+  return Container(
+    width: double.infinity, // Takes full width of the parent container
+    decoration: BoxDecoration(
+      // Red linear gradient matching the blue-to-purple gradient style
+      gradient: const LinearGradient(
+        colors: [
+          Color(0xFFFF3B30), // Bright vibrant red (left)
+          Color.fromARGB(255, 165, 0, 0), // Darker red (right)
+        ],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ),
+      borderRadius: BorderRadius.circular(18.0), // Rounded pill corners
+    ),
+    child: Material(
+      color: Colors.transparent, // Allows gradient to show through
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18.0), // Matches container radius
+        onTap: () {
+          context.go(link);
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0), // Vertical thickness
+          child: Center(
+            child: Text(
+              text, // Your button text
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }

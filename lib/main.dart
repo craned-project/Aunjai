@@ -55,12 +55,12 @@ final GoRouter _router = GoRouter(
           path: '/call/result', 
           builder: (context, state) {
             // Cast the extra parameter back into a Map
-            final risks = state.extra as Map<String, double>;
+            final risks = state.extra as Map<String, double>?;
             
             return CallResultPage(
-              actionRisk: risks['actionRisk'] ?? 0.0,
-              identityRisk: risks['identityRisk'] ?? 0.0,
-              contextRisk: risks['contextRisk'] ?? 0.0
+              actionRisk: risks?['actionRisk'] ?? 0.0,
+              identityRisk: risks?['identityRisk'] ?? 0.0,
+              contextRisk: risks?['contextRisk'] ?? 0.0
             );
           }
         ),
@@ -73,12 +73,12 @@ final GoRouter _router = GoRouter(
           path: '/result', 
           builder: (context, state) {
             // Cast the extra parameter back into a Map
-            final risks = state.extra as Map<String, double>;
+            final risks = state.extra as Map<String, double>?;
             
             return ResultPage(
-              actionRisk: risks['actionRisk'] ?? 0.0,
-              identityRisk: risks['identityRisk'] ?? 0.0,
-              contextRisk: risks['contextRisk'] ?? 0.0
+              actionRisk: risks?['actionRisk'] ?? 0.0,
+              identityRisk: risks?['identityRisk'] ?? 0.0,
+              contextRisk: risks?['contextRisk'] ?? 0.0
             );
           }
         ),
