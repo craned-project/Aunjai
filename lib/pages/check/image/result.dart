@@ -120,7 +120,9 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                             ),
                           ),
                         ),
+                        
                         const SizedBox(height: 16),
+                        
 
                         // Notification Sub-heading Dialog Banner
                         /*Container(
@@ -237,6 +239,9 @@ class _ImageCheckPageState extends State<ImageCheckPage> {
                             ],
                           ),
                         ),
+                        const SizedBox(height: 18),
+
+                        buildGradientButton(context, "รายงานผล", "/report"),
                       ],
                     ),
                   ),
@@ -338,4 +343,44 @@ class BottomNavBarClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+Widget buildGradientButton(BuildContext context, String text, String link) {
+  return Container(
+    width: double.infinity, // Takes full width of the parent container
+    decoration: BoxDecoration(
+      // Red linear gradient matching the blue-to-purple gradient style
+      gradient: const LinearGradient(
+        colors: [
+          Color(0xFFFF3B30), // Bright vibrant red (left)
+          Color.fromARGB(255, 165, 0, 0), // Darker red (right)
+        ],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ),
+      borderRadius: BorderRadius.circular(18.0), // Rounded pill corners
+    ),
+    child: Material(
+      color: Colors.transparent, // Allows gradient to show through
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18.0), // Matches container radius
+        onTap: () {
+          context.go(link);
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0), // Vertical thickness
+          child: Center(
+            child: Text(
+              text, // Your button text
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
