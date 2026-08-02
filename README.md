@@ -1,6 +1,9 @@
 # Aunjai
 An AI powered mobile app for detecting online scams in order to warn the user and provide information for dealing with scamers with such scamming methods. **The app is only developped for Android at the moment**.
 
+> [!IMPORTANT]
+> TO DEVS! PLEASE CONNECT API TO TS BC IDK HOW TO!!
+
 > [!Note]
 > This repository only contains **The Application Part** of the project!
 
