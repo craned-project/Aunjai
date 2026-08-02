@@ -20,7 +20,7 @@ class Evidence {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  String _selectedPlatform = 'โทรศัพท์';
+  String _selectedPlatform = 'phone';
   String? _selectedRegion;
 
   List<double> scores = [0.85, 0.75, 0.20, 0.90];
@@ -36,13 +36,19 @@ class _ReportPageState extends State<ReportPage> {
       TextEditingController();
 
   // Mock Dropdown Lists
-  final List<String> _platforms = [
-    'โทรศัพท์',
-    'แชท',
-    'โซเชียล',
-    'อีเมล',
-    'รูปภาพ',
-  ];
+  final Map<String, String> platforms = {
+      'phone': 'โทรศัพท์',
+      'line': 'LINE',
+      'facebook': 'Facebook',
+      'messenger': 'Messenger',
+      'email': 'Email',
+      'sms': 'SMS',
+      'instagram': 'Instagram',
+      'twitter': 'Twitter',
+      'tiktok': 'TikTok',
+      'telegram': 'Telegram',
+      'whatsapp': 'WhatsApp'
+  };
 
   List<Evidence> evidences = [
     Evidence(
@@ -243,7 +249,7 @@ class _ReportPageState extends State<ReportPage> {
                       _buildFormFieldLabel("ช่องทางที่พบภัยหลอกลวง", true),
                       _buildDropdownField<String>(
                         value: _selectedPlatform,
-                        items: _platforms,
+                        items: platforms,
                         onChanged: (val) =>
                             setState(() => _selectedPlatform = val!),
                       ),
@@ -254,7 +260,7 @@ class _ReportPageState extends State<ReportPage> {
                       _buildDropdownField<String?>(
                         value: _selectedRegion,
                         hint: "เลือกจังหวัดของคุณ",
-                        items: Provinces,
+                        items: provinces,
                         onChanged: (val) =>
                             setState(() => _selectedRegion = val),
                       ),
@@ -534,9 +540,9 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   Widget _buildDropdownField<T>({
-    required T value,
+    required T? value, // Changed to T? so null can show the hint
     String? hint,
-    required List<String> items,
+    required Map<T, String> items, // Changed Map key to T
     required ValueChanged<T?> onChanged,
   }) {
     return Container(
@@ -562,8 +568,12 @@ class _ReportPageState extends State<ReportPage> {
           ),
           isExpanded: true,
           style: const TextStyle(color: Colors.white, fontSize: 15),
-          items: items.map((String item) {
-            return DropdownMenuItem<T>(value: item as T, child: Text(item));
+          // Fix: Use items.entries.map instead of items.map
+          items: items.entries.map((entry) {
+            return DropdownMenuItem<T>(
+              value: entry.key,
+              child: Text(entry.value),
+            );
           }).toList(),
           onChanged: onChanged,
         ),
