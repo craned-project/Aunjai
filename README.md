@@ -1,17 +1,58 @@
 # Aunjai
+An AI powered mobile app for detecting online scams in order to warn the user and provide information for dealing with scamers with such scamming methods. **The app is only developped for Android at the moment**.
 
-A new Flutter project.
+> [!Note]
+> This repository only contains **The Application Part** of the project!
 
-## Getting Started
+## Modes
+### 1. Message Mode
+Allows the user to paste scammer's messages from SMS or chatting application, such as Line, Facebook Messenger, Instagram, etc. into the app. The AI will then analyze the message, and return how likely it maybe a scam.
 
-This project is a starting point for a Flutter application.
+### 2. Image Mode
+Allows the user to upload multiple images onto the app, which the AI will analize whether it's likely to be a scam or not.
 
-A few resources to get you started if this is your first Flutter project:
+### 3. Quick Mode / Call Mode
+The app will ask the user about the scammer's behaviour, which the user can answer the question in real time. The question may be multiple choices or a text answer. After a set amount of question, or if the AI is absolutely sure about the analysis, it'll then give the user the percentage of the probablity of it being a scammer.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Scoring Criteria
+### 1. Identity Risk — 30% 
+- Pretending to be a Government Worker or an Organization
+- Using fake name, organization, or rank as facade
+- Mismatching phone number or social media / Line account.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 2. Communication Pressure — 40%
+- Rushing the process
+- Using threats e.g. sueing, blacklisting, or account closures
+- Using sentences that causes fear
+
+### 3. Action & Request Risk — 30%
+- Asking for sensitive informations
+- Demanding the user to transfer money
+
+Each criteria has a full score of 100%, which will then be weigh down before averaging to the final 100%, for example:
+| Criteria | Weight | Score |
+| -------- | ------ | ----- |
+| Identity Risk | 30% | 80% |
+| Communication Pressure | 40% | 70% |
+| Action & Request Risk | 30% | 20% |
+| Final Score | 100% | 58% |
+
+## Reporting Results
+After reviewing the results given by the AI, the user can choose to report the results / threat to the government database. They can choose to specify the following information to make tracking easier for the government.
+### 1. Method of Scam (Required)
+- Telephone Call
+- Chats
+- Social Network
+- E-mail
+- Images
+### 2. Provinces (Optional)
+The user can choose to specify the province from 77 provinces of Thailand.
+### 3. Remarks (Optional)
+Remarks as paragraph text
+
+## Government Portal
+All reports will be summarized into statistics, displayed on the government portal. It'll be filtered into types of scam, method of scams, time reported, and provinces reported from. Take a look at the [Aunjai Government Portal](https://github.com/craned-project/AunjaiGovPortal) (Currently Private) here!
+
+
+*มีอุ่นใจ อุ่นใจปลอดภัยแน่นอน*<br>
+*With Aunjai, Both safety and peace of mind are guaranteed.*
