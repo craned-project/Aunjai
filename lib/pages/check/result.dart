@@ -28,7 +28,7 @@ class _ResultPageState extends State<ResultPage> {
     final double contextRisk = 0.0;
 
     // 2. คำนวณคะแนนเฉลี่ยรวมอัตโนมัติ (คะแนนรวมกัน หารด้วย 3 และทำเป็นเปอร์เซ็นต์ 0.0 - 1.0)
-    double dangerPercent = (actionRisk + identityRisk + contextRisk) / 3;
+    double dangerPercent = (actionRisk + identityRisk) / 2;
 
     return Scaffold(
       backgroundColor: scaffoldBg,
@@ -173,7 +173,7 @@ class _ResultPageState extends State<ResultPage> {
                     // 3. ส่วนการ์ดเกณฑ์การประเมินเรียงแบบแนวตั้ง
                     _InsightCard(
                       title: "Action & Request Risk",
-                      weight: 30,
+                      weight: 50,
                       score: (actionRisk * 100).toInt(),
                       description:
                           "ระบบตรวจพบพฤติกรรมที่พยายามให้ผู้ใช้งานโอนเงิน เปิดเผยรหัส หรือให้ข้อมูลสำคัญ ภายใต้แรงกดดันด้านเวลา ซึ่งเป็นสัญญาณการหลอกลวงที่พบบ่อย",
@@ -182,19 +182,10 @@ class _ResultPageState extends State<ResultPage> {
                     
                     _InsightCard(
                       title: "Identity Risk",
-                      weight: 35,
+                      weight: 50,
                       score: (identityRisk * 100).toInt(),
                       description:
                           "ตรวจพบการร้องขอให้ยืนยันตัวตนในรูปแบบที่ผิดปกติจากมาตรฐานบัญชีทั่วไป หรือลักษณะบัญชีผู้ส่งมีความน่าสงสัย",
-                    ),
-                    const SizedBox(height: 16),
-
-                    _InsightCard(
-                      title: "Context Risk",
-                      weight: 35,
-                      score: (contextRisk * 100).toInt(),
-                      description:
-                          "ตรวจพบการติดต่อที่ไม่มีความเชื่อมโยงกับพฤติกรรมในอดีตของผู้ใช้งาน หรือเป็นการอ้างอิงถึงเหตุการณ์ พัสดุ หรือคดีความที่ไม่มีที่มาที่ไป ซึ่งเป็นรูปแบบการสร้างสถานการณ์จำลองที่มิจฉาชีพมักใช้เพื่อเริ่มบทสนทนา",
                     ),
                     const SizedBox(height: 18),
 
