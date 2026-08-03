@@ -18,27 +18,21 @@ Allows the user to upload multiple images onto the app, which the AI will analiz
 The app will ask the user about the scammer's behaviour, which the user can answer the question in real time. The question may be multiple choices or a text answer. After a set amount of question, or if the AI is absolutely sure about the analysis, it'll then give the user the percentage of the probablity of it being a scammer.
 
 ## Scoring Criteria
-### 1. Identity Risk — 30% 
+### 1. Identity Risk — 50% 
 - Pretending to be a Government Worker or an Organization
 - Using fake name, organization, or rank as facade
 - Mismatching phone number or social media / Line account.
 
-### 2. Communication Pressure — 40%
-- Rushing the process
-- Using threats e.g. sueing, blacklisting, or account closures
-- Using sentences that causes fear
-
-### 3. Action & Request Risk — 30%
+### 2. Action & Request Risk — 50%
 - Asking for sensitive informations
 - Demanding the user to transfer money
 
 Each criteria has a full score of 100%, which will then be weigh down before averaging to the final 100%, for example:
 | Criteria | Weight | Score |
 | -------- | ------ | ----- |
-| Identity Risk | 30% | 80% |
-| Communication Pressure | 40% | 70% |
-| Action & Request Risk | 30% | 20% |
-| Final Score | 100% | 58% |
+| Identity Risk | 50% | 80% |
+| Action & Request Risk | 50% | 70% |
+| Final Score | 100% | 75% |
 
 ## Reporting Results
 After reviewing the results given by the AI, the user can choose to report the results / threat to the government database. They can choose to specify the following information to make tracking easier for the government.
