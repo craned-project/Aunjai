@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
+import 'package:aunjai/services/analysis_service.dart';
+import 'package:aunjai/models/analysis_result.dart';
 
 class Message extends StatefulWidget {
   const Message({super.key});
@@ -17,8 +20,10 @@ class MessageType {
 
 class _MessageState extends State<Message> {
   final List<TextEditingController> _controllers = [
-    TextEditingController(), // Starts with the first mandatory text box
+    TextEditingController(),
   ];
+  final AnalysisService _analysisService = AnalysisService();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -32,22 +37,40 @@ class _MessageState extends State<Message> {
   // Tracks which tab is selected: 0 = SMS, 1 = แชท, 2 = Email
   int _selectedTabIndex = 0;
 
-  void analyzeMessage() {
+  void analyzeMessage() async {
     final List<String> msgList = _controllers
-      .map((controller) => controller.text.trim()) // Get text and trim extra whitespace
-      .where((text) => text.isNotEmpty)            // Optional: Filter out empty boxes if you want
+      .map((controller) => controller.text.trim())
+      .where((text) => text.isNotEmpty)
       .toList();
-    
 
-    Map<String, dynamic> msg = {'method': _selectedTabIndex, 'msglist': msgList};
-    if (msg['msglist'].isEmpty) {
-      print("Please type a message first!");
+    if (msgList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('กรุณาพิมพ์ข้อความก่อน')),
+      );
       return;
     }
 
-    // 3. Print or pass it to your backend API / AI processing logic
-    print("Packaged Message Method: ${msg['method']}");
-    print("Packaged Message Strings: ${msg['msglist']}");
+    final platforms = ['sms', 'line', 'email'];
+    final platform = platforms[_selectedTabIndex];
+
+    setState(() => _isLoading = true);
+    try {
+      final result = await _analysisService.analyzeChat(msgList, platform);
+      if (mounted) {
+        context.go('/result', extra: result);
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_analysisService.getErrorMessage(e)),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override

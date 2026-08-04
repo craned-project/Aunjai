@@ -3,9 +3,15 @@ import 'package:aunjai/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
+import 'package:aunjai/core/api_client.dart';
+import 'package:aunjai/config/api_config.dart';
 
 class ReportPage extends StatefulWidget {
-  const ReportPage({super.key});
+  final double? actionRisk;
+  final double? identityRisk;
+
+  const ReportPage({super.key, this.actionRisk, this.identityRisk});
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -23,14 +29,19 @@ class _ReportPageState extends State<ReportPage> {
   String _selectedPlatform = 'phone';
   String? _selectedRegion;
 
-  List<double> scores = [0.85, 0.75, 0.20, 0.90];
-  double findAverage(List<double> s) {
-    double avg = 0;
-    for (double d in scores) {
-      avg += d;
-    }
-    return avg / 4;
+  // Risk scores from API: ActionsAndRequest and IdentityRisk (0.0 - 1.0)
+  late final double actionRisk;
+  late final double identityRisk;
+
+  @override
+  void initState() {
+    super.initState();
+    actionRisk = widget.actionRisk ?? 0.0;
+    identityRisk = widget.identityRisk ?? 0.0;
   }
+
+  /// Total risk score = (ActionsAndRequest + IdentityRisk) / 2
+  double get totalRiskScore => (actionRisk + identityRisk) / 2;
 
   final TextEditingController _additionalDetailsController =
       TextEditingController();
@@ -165,9 +176,9 @@ class _ReportPageState extends State<ReportPage> {
                               ),
                             ),
                             child: Text(
-                              "${dangerStatus(findAverage(scores))} (${(findAverage(scores) * 100).toInt()}/100)",
+                              "${dangerStatus(totalRiskScore)} (${(totalRiskScore * 100).toInt()}/100)",
                               style: TextStyle(
-                                color: barColor(findAverage(scores), 'ai')[0],
+                                color: barColor(totalRiskScore, 'ai')[0],
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -176,27 +187,15 @@ class _ReportPageState extends State<ReportPage> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      // Metric Metrics 2x2 Grid Layout
+                      // Risk dimension tiles: ActionsAndRequest + IdentityRisk
                       Row(
                         children: [
                           Expanded(
-                            child: _buildMetricTile("ด้านข้อความ", scores[0]),
+                            child: _buildMetricTile("Action & Request", actionRisk),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _buildMetricTile("ด้านพฤติกรรม", scores[1]),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildMetricTile("ด้านภาพถ่าย", scores[2]),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildMetricTile("Quick Mode", scores[3]),
+                            child: _buildMetricTile("Identity Risk", identityRisk),
                           ),
                         ],
                       ),
@@ -359,15 +358,32 @@ class _ReportPageState extends State<ReportPage> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       final Map<String, dynamic> reportData = {
                         'platform': _selectedPlatform,
                         'region': _selectedRegion,
                         'notes': _additionalDetailsController.text.trim(),
                       };
-                      print(
-                        "Packaging security log report payload context context: $reportData",
-                      );
+                      try {
+                        await ApiClient().dio.post(ApiConfig.govSubmit, data: reportData);
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('ส่งรายงานเรียบร้อยแล้ว'),
+                            backgroundColor: Color(0xff22c55e),
+                          ),
+                        );
+                        context.go('/home');
+                      } on DioException catch (e) {
+                        if (!context.mounted) return;
+                        final msg = e.response?.data?['detail'] ?? 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(msg.toString()),
+                            backgroundColor: const Color(0xffef4444),
+                          ),
+                        );
+                      }
                     },
                     child: const Text(
                       "ส่งไปยังฐานข้อมูลของเรา",

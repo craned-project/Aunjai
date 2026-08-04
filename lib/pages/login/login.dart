@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
+import 'package:aunjai/services/auth_service.dart';
 
 class LogInPage extends StatefulWidget {
   const LogInPage({super.key});
@@ -16,8 +18,9 @@ class _LogInPageState extends State<LogInPage> {
 
   bool _rememberMe = false;
   bool _obscurePassword = true;
-  bool _isFormInputValid =
-      false; // 🎯 Tracks if all text fields are filled out properly
+  bool _isFormInputValid = false;
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -311,28 +314,41 @@ class _LogInPageState extends State<LogInPage> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            onPressed: _isFormInputValid
-                                ? () {
-                                    // 🎯 STEP 1: Run the formal Form validation check UI pass
+                            onPressed: (_isFormInputValid && !_isLoading)
+                                ? () async {
                                     if (_formKey.currentState!.validate()) {
-                                      // 🎯 STEP 2: Package the clean inputs into your Map format
-                                      final Map<String, dynamic> payload = {
-                                        'emailoruser': _emailOrUsernameController.text.trim(),
-                                        'password': _passwordController.text,
-                                        'remember_me': _rememberMe
-                                      };
-
-                                      // 🎯 STEP 3: Place your network request / sending logic right here!
-                                      print(
-                                        "Ready to send packed object: $payload",
-                                      );
-
-                                      // Your sending method goes here:
-                                      // _authService.registerUser(payload);
+                                      setState(() => _isLoading = true);
+                                      try {
+                                        await _authService.login(
+                                          _emailOrUsernameController.text.trim(),
+                                          _passwordController.text,
+                                        );
+                                        if (mounted) context.go('/home');
+                                      } on DioException catch (e) {
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(_authService.getErrorMessage(e)),
+                                              backgroundColor: Colors.red.shade700,
+                                            ),
+                                          );
+                                        }
+                                      } finally {
+                                        if (mounted) setState(() => _isLoading = false);
+                                      }
                                     }
                                   }
                                 : null,
-                            child: Text(
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
                               "เข้าสู่ระบบ",
                               style: TextStyle(
                                 fontSize: 18,

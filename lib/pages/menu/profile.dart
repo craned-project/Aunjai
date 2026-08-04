@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import 'package:aunjai/utils.dart';
+import 'package:aunjai/services/user_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,7 +19,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String _email = "";
   String _phoneNumber = "";
   String _userRegion = "";
-  String? _profileImageUrl;
   bool _isShieldActive = true;
 
 
@@ -27,27 +28,34 @@ class _ProfilePageState extends State<ProfilePage> {
     _fetchUserDataFromDB();
   }
 
-  // 🎯 DATABASE INTEGRATION PLACEHOLDER
   Future<void> _fetchUserDataFromDB() async {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Replace this mock delay with your actual database call.
-      // Example: var data = await supabase.from('users').select().single();
-      await Future.delayed(const Duration(milliseconds: 1200));
+      final profile = await UserService().getProfile();
 
       setState(() {
-        _username = "จุฑามาศ";
-        _email = "juthamas.aunjai@gmail.com";
-        _phoneNumber = "089-583-6152";
-        _userRegion = "กรุงเทพมหานคร";
-        _profileImageUrl = null;
-        _isShieldActive = true;
+        _username = profile.username;
+        _email = profile.email;
+        _phoneNumber = profile.phone ?? "";
+        _userRegion = profile.province ?? "";
+        _isShieldActive = profile.isVerified;
         _isLoading = false;
       });
+    } on DioException catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(UserService().getErrorMessage(e))),
+        );
+      }
     } catch (e) {
       setState(() => _isLoading = false);
-      print("Error loading profile from DB: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('เกิดข้อผิดพลาด กรุณาลองใหม่')),
+        );
+      }
     }
   }
 
@@ -121,10 +129,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             Center(
                               child: GestureDetector(
                                 onTap: () {
-                                  print(
-                                    "Profile picture circle tapped! Navigating to settings...",
-                                  );
-                                  // 🎯 Navigate to your settings route path cleanly using GoRouter
                                   context.go('/settings');
                                 },
                                 child: Container(
@@ -150,45 +154,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                   child: ClipOval(
                                     child: Container(
                                       color: const Color(0xff111827),
-                                      // 🎯 Checks if there is a profile picture URL present
-                                      child:
-                                          _profileImageUrl != null &&
-                                              _profileImageUrl!.isNotEmpty
-                                          ? Image.network(
-                                              _profileImageUrl!,
-                                              fit: BoxFit.cover,
-                                              // Fallback icon placeholder if the image URL breaks or fails to load natively
-                                              errorBuilder:
-                                                  (
-                                                    context,
-                                                    error,
-                                                    stackTrace,
-                                                  ) => const Icon(
-                                                    Icons.person,
-                                                    size: 55,
-                                                    color: Colors.white24,
-                                                  ),
-                                              loadingBuilder:
-                                                  (
-                                                    context,
-                                                    child,
-                                                    loadingProgress,
-                                                  ) {
-                                                    if (loadingProgress == null)
-                                                      return child;
-                                                    return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            strokeWidth: 2,
-                                                          ),
-                                                    );
-                                                  },
-                                            )
-                                          : const Icon(
-                                              Icons.person,
-                                              size: 55,
-                                              color: Colors.white24,
-                                            ),
+                                      child: const Icon(
+                                        Icons.person,
+                                        size: 55,
+                                        color: Colors.white24,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -292,7 +262,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     icon: Icons.phone_outlined,
                                     label: "เบอร์โทรศัพท์ติดต่อ (Phone Number)",
                                     value:
-                                        "${_phoneNumber.substring(0, 3)}-XXX-XXXX",
+                                        _phoneNumber.length >= 3
+                                            ? "${_phoneNumber.substring(0, 3)}-XXX-XXXX"
+                                            : _phoneNumber,
                                   ),
                                   _buildDivider(),
                                   _buildProfileItem(

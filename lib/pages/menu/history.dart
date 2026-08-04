@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:aunjai/utils.dart';
+import 'package:aunjai/core/api_client.dart';
+import 'package:aunjai/config/api_config.dart';
 
 class Status {
   final String status;
@@ -39,6 +41,7 @@ class _HistoryState extends State<History> {
   // 0 = ทั้งหมด, 1 = ข้อความ, 2 = เบอร์โทร, 3 = ลิงก์, 4 = ภาพ
   // 0 = safe, 1 = sus, 2 = danger!
   int _activeFilterIndex = 0;
+  bool _isLoading = true;
   final List<Status> status = [
     Status(
       status: "ปลอดภัย",
@@ -75,33 +78,72 @@ class _HistoryState extends State<History> {
     }).toList();
   }
 
-  // Mock data matching your exact layout entries
-  final List<HistoryItem> _allHistoryItems = [
-    const HistoryItem(
-      title: "SMS อ้างชื่อรับสิทธิ์เงินกู้",
-      timestamp: 1782624319,
-      type: 1,
-      status: 2,
-    ),
-    const HistoryItem(
-      title: "shopee-th-gift.com",
-      timestamp: 1782424319,
-      type: 3,
-      status: 1,
-    ),
-    const HistoryItem(
-      title: "สลิปธนาคารกสิกรไทย",
-      timestamp: 1782512719,
-      type: 4,
-      status: 0,
-    ),
-    const HistoryItem(
-      title: "เบอร์แปลก +66 81-XXX-XXXX",
-      timestamp: 1782513319,
-      type: 2,
-      status: 2,
-    ),
-  ];
+  List<HistoryItem> _allHistoryItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHistory();
+  }
+
+  Future<void> _fetchHistory() async {
+    try {
+      final response = await ApiClient().dio.get(ApiConfig.scamReports);
+      final List<dynamic> data = response.data is List ? response.data : [];
+      setState(() {
+        _allHistoryItems = data.map((item) {
+          final scamType = (item['scam_type'] ?? '').toString().toLowerCase();
+          int type;
+          if (scamType.contains('sms') || scamType.contains('message') || scamType.contains('chat') || scamType.contains('ข้อความ')) {
+            type = 1;
+          } else if (scamType.contains('phone') || scamType.contains('call') || scamType.contains('เบอร์')) {
+            type = 2;
+          } else if (scamType.contains('link') || scamType.contains('url') || scamType.contains('web') || scamType.contains('ลิงก์')) {
+            type = 3;
+          } else if (scamType.contains('image') || scamType.contains('photo') || scamType.contains('ภาพ') || scamType.contains('รูป')) {
+            type = 4;
+          } else {
+            type = 1;
+          }
+
+          final riskLevel = (item['risk_level'] ?? '').toString().toLowerCase();
+          final totalScore = item['total_risk_score'] ?? 0;
+          int statusIndex;
+          if (riskLevel.contains('high') || riskLevel.contains('danger') || totalScore >= 70) {
+            statusIndex = 2;
+          } else if (riskLevel.contains('medium') || riskLevel.contains('suspect') || totalScore >= 40) {
+            statusIndex = 1;
+          } else {
+            statusIndex = 0;
+          }
+
+          final createdAt = item['created_at'] ?? '';
+          int timestamp;
+          try {
+            timestamp = DateTime.parse(createdAt).millisecondsSinceEpoch ~/ 1000;
+          } catch (_) {
+            timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+          }
+
+          final title = item['platform'] ?? item['scam_type'] ?? 'ไม่ระบุ';
+
+          return HistoryItem(
+            title: title.toString(),
+            timestamp: timestamp,
+            type: type,
+            status: statusIndex,
+          );
+        }).toList();
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +202,16 @@ class _HistoryState extends State<History> {
           const SizedBox(height: 24),
           // 2. Dynamic List of Checked History Cards
           Expanded(
-            child: ListView.builder(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                : _filteredHistoryItems.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "ไม่มีประวัติการตรวจสอบ",
+                          style: TextStyle(color: Colors.white54, fontSize: 14),
+                        ),
+                      )
+                    : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               itemCount: _filteredHistoryItems.length,
               itemBuilder: (context, index) {

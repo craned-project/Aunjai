@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
+import 'package:aunjai/services/analysis_service.dart';
+import 'package:aunjai/models/analysis_result.dart';
 
 class LinkCheck extends StatefulWidget {
   const LinkCheck({super.key});
@@ -10,6 +13,8 @@ class LinkCheck extends StatefulWidget {
 
 class _LinkCheckState extends State<LinkCheck> {
   final TextEditingController _linkController = TextEditingController();
+  final AnalysisService _analysisService = AnalysisService();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -161,10 +166,33 @@ class _LinkCheckState extends State<LinkCheck> {
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  onPressed: () {
-                    final String urlToCheck = _linkController.text.trim();
-                    print("Sending Link for safe check verification: $urlToCheck");
-                  },
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          final String urlToCheck = _linkController.text.trim();
+                          if (urlToCheck.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('กรุณากรอกลิงก์ที่ต้องการตรวจสอบ')),
+                            );
+                            return;
+                          }
+                          setState(() => _isLoading = true);
+                          try {
+                            final result = await _analysisService.analyzeLink(urlToCheck, 'line');
+                            if (mounted) context.go('/result', extra: result);
+                          } on DioException catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(_analysisService.getErrorMessage(e)),
+                                  backgroundColor: Colors.red.shade700,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) setState(() => _isLoading = false);
+                          }
+                        },
                   child: const Text(
                     "ส่งไปตรวจสอบลิงก์",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),

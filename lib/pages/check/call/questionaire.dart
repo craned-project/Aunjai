@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:aunjai/questionlist.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
+import 'package:aunjai/services/analysis_service.dart';
+import 'package:aunjai/models/analysis_result.dart';
 
 // 🎯 Enum for controlling the UI state
 enum CallUIState {
@@ -24,6 +27,9 @@ class _CallModeState extends State<CallMode> {
   List<Question> unaskedQuestions = [];
   int questionsAskedCount = 0;
   static const int maxQuestions = 5;
+  final AnalysisService _analysisService = AnalysisService();
+  bool _isAnalyzing = false;
+  List<String> _collectedAnswers = [];
 
   // Track max possible points vs accumulated points per category
   int actionEarned = 0;
@@ -138,7 +144,6 @@ class _CallModeState extends State<CallMode> {
   /// Step 3: Handle Multiple Choice Selection
   void submitMultipleChoiceAnswer(Choice selectedChoice) {
     if (currentQuestion != null && currentQuestion!.choice != null) {
-      // Find the highest possible score in this question to calculate a proper ratio
       int maxQuestionScore = currentQuestion!.choice!
           .map((c) => c.score)
           .reduce((value, element) => value > element ? value : element);
@@ -149,6 +154,7 @@ class _CallModeState extends State<CallMode> {
         maxQuestionScore,
       );
       activeContextTags.addAll(currentQuestion!.relevantTags);
+      _collectedAnswers.add('${currentQuestion!.q}: ${selectedChoice.text}');
     }
 
     moveToNextQuestion();
@@ -167,7 +173,7 @@ class _CallModeState extends State<CallMode> {
 
     for (var keyword in currentQuestion!.targetKeywords!) {
       if (lowerInput.contains(keyword.toLowerCase())) {
-        earned = maxTextScore; // High bump for hitting a trap keyword
+        earned = maxTextScore;
         break;
       }
     }
@@ -177,6 +183,10 @@ class _CallModeState extends State<CallMode> {
     if (earned > 0) {
       _addPointsToCategory(currentQuestion!.relevantTags, earned, maxTextScore);
       activeContextTags.addAll(currentQuestion!.relevantTags);
+    }
+
+    if (userInput.isNotEmpty) {
+      _collectedAnswers.add('${currentQuestion!.q}: $userInput');
     }
 
     moveToNextQuestion();
@@ -215,27 +225,37 @@ class _CallModeState extends State<CallMode> {
     });
   }
 
-  /// Calculates dynamic ratio percentages mapped out of 30%, 35%, and 35%
-  void endGameAndShowVerdict() {
-    // Calculate raw severity ratios (0.0 to 1.0) per category
+  /// Calculates dynamic ratio percentages and sends to API
+  void endGameAndShowVerdict() async {
     double actionRatio = actionMax > 0 ? (actionEarned / actionMax) : 0.0;
     double identityRatio = identityMax > 0
         ? (identityEarned / identityMax)
         : 0.0;
     double contextRatio = contextMax > 0 ? (contextEarned / contextMax) : 0.0;
 
-    print(
-      "${actionRatio * 100}% | ${identityRatio * 100}% | ${contextRatio * 100}%",
-    );
-
-    context.go(
-      '/call/result',
-      extra: {
-        'actionRisk': actionRatio,
-        'identityRisk': identityRatio,
-        'contextRisk': contextRatio,
-      },
-    );
+    setState(() => _isAnalyzing = true);
+    try {
+      final result = await _analysisService.analyzePhone(
+        'unknown',
+        _collectedAnswers,
+        'phone',
+      );
+      if (mounted) context.go('/result', extra: result);
+    } on DioException {
+      // Fallback to local scores if API fails
+      if (mounted) {
+        context.go(
+          '/call/result',
+          extra: {
+            'actionRisk': actionRatio,
+            'identityRisk': identityRatio,
+            'contextRisk': contextRatio,
+          },
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isAnalyzing = false);
+    }
   }
 
   String? selectedCategoryTag;

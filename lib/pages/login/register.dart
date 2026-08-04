@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
+import 'package:aunjai/services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -17,8 +19,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _hasAcceptedTerms = false;
   bool _obscurePassword = true;
-  bool _isFormInputValid =
-      false; // 🎯 Tracks if all text fields are filled out properly
+  bool _isFormInputValid = false;
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -331,23 +334,34 @@ class _RegisterPageState extends State<RegisterPage> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            onPressed: canSubmit
-                                ? () {
-                                    // 1. Trigger the standard form layout validation checks
+                            onPressed: (canSubmit && !_isLoading)
+                                ? () async {
                                     if (_formKey.currentState!.validate()) {
-                                      // 🎯 2. Package your fields into the exact structured map format you requested!
-                                      final Map<String, String>
-                                      registrationData = {
-                                        'user': _usernameController.text.trim(),
-                                        'email': _emailController.text.trim(),
-                                        'password': _passwordController.text,
-                                      };
-
-                                      // 3. Print or pass this object to your API authentication function
-                                      print(
-                                        "Packed Registration Data: $registrationData",
-                                      );
-
+                                      setState(() => _isLoading = true);
+                                      try {
+                                        await _authService.register(
+                                          username: _usernameController.text.trim(),
+                                          email: _emailController.text.trim(),
+                                          password: _passwordController.text,
+                                        );
+                                        // Auto-login after register
+                                        await _authService.login(
+                                          _emailController.text.trim(),
+                                          _passwordController.text,
+                                        );
+                                        if (mounted) context.go('/home');
+                                      } on DioException catch (e) {
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(_authService.getErrorMessage(e)),
+                                              backgroundColor: Colors.red.shade700,
+                                            ),
+                                          );
+                                        }
+                                      } finally {
+                                        if (mounted) setState(() => _isLoading = false);
+                                      }
                                     }
                                   }
                                 : null,

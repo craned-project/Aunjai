@@ -1,17 +1,14 @@
 import 'package:aunjai/utils.dart';
+import 'package:aunjai/models/analysis_result.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ResultPage extends StatefulWidget {
-  final double actionRisk;   // Value from 0.0 to 30.0
-  final double identityRisk; // Value from 0.0 to 35.0
-  final double contextRisk; // Value from 0.0 to 35.0
+  final AnalysisResult? analysisResult;
 
   const ResultPage({
     super.key,
-    this.actionRisk = 0.0,
-    this.identityRisk = 0.0,
-    this.contextRisk = 0.0,
+    this.analysisResult,
   });
 
   @override
@@ -21,14 +18,13 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
-    // Sleek dark theme colors matching your design
     const scaffoldBg = Color(0xff091026);
-    final double actionRisk = 0.0;
-    final double identityRisk = 0.0;
-    final double contextRisk = 0.0;
+    final result = widget.analysisResult;
 
-    // 2. คำนวณคะแนนเฉลี่ยรวมอัตโนมัติ (คะแนนรวมกัน หารด้วย 3 และทำเป็นเปอร์เซ็นต์ 0.0 - 1.0)
-    double dangerPercent = (actionRisk + identityRisk) / 2;
+    final double actionRisk = (result?.actionsScore ?? 0) / 100.0;
+    final double identityRisk = (result?.identityScore ?? 0) / 100.0;
+    final double dangerPercent = (result?.totalRiskScore ?? 0) / 100.0;
+    final suggestions = result?.suggestion ?? [];
 
     return Scaffold(
       backgroundColor: scaffoldBg,
@@ -74,7 +70,7 @@ class _ResultPageState extends State<ResultPage> {
                     ],
                   ),
                   GestureDetector(
-                    onTap: () => {context.go('/report')},
+                    onTap: () => {context.go('/report', extra: {'actionRisk': actionRisk, 'identityRisk': identityRisk})},
                     child: const Icon(
                       Icons.report,
                       color: Colors.redAccent,
@@ -133,21 +129,25 @@ class _ResultPageState extends State<ResultPage> {
                           color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
-                      child: const Column(
+                      child: Column(
                         children: [
-                          _WarningRow(
-                            icon: Icons.notifications_active_outlined, // เปลี่ยนกลับมาเป็น Icon
-                            iconColor: Color(0xfff87171), // สีแดง
-                            text:
-                                "อุ่นใจขอเตือนนะครับ จากรูปแบบการสนทนาที่ตรวจพบ มีความเสี่ยงสูงที่จะเป็นการหลอกลวง",
-                          ),
-                          SizedBox(height: 16),
-                          _WarningRow(
-                            icon: Icons.chat_bubble_outline,
-                            iconColor: Colors.white70, // สีขาวเทา
-                            text:
-                                "หน่วยงานจริงจะไม่เร่งให้โอนเงิน และไม่ขอข้อมูลสำคัญผ่านแชทหรือโทรศัพท์",
-                          ),
+                          if (suggestions.isNotEmpty)
+                            ...suggestions.map((s) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _WarningRow(
+                                icon: Icons.info_outline,
+                                iconColor: dangerPercent > 0.7
+                                    ? const Color(0xfff87171)
+                                    : const Color(0xfffbbf24),
+                                text: s,
+                              ),
+                            ))
+                          else
+                            const _WarningRow(
+                              icon: Icons.check_circle_outline,
+                              iconColor: Color(0xff34d399),
+                              text: "ไม่พบสัญญาณความเสี่ยงที่ชัดเจน",
+                            ),
                         ],
                       ),
                     ),
@@ -175,21 +175,19 @@ class _ResultPageState extends State<ResultPage> {
                       title: "Action & Request Risk",
                       weight: 50,
                       score: (actionRisk * 100).toInt(),
-                      description:
-                          "ระบบตรวจพบพฤติกรรมที่พยายามให้ผู้ใช้งานโอนเงิน เปิดเผยรหัส หรือให้ข้อมูลสำคัญ ภายใต้แรงกดดันด้านเวลา ซึ่งเป็นสัญญาณการหลอกลวงที่พบบ่อย",
+                      description: result?.actionsDescription ?? "ไม่มีข้อมูล",
                     ),
                     const SizedBox(height: 16),
-                    
+
                     _InsightCard(
                       title: "Identity Risk",
                       weight: 50,
                       score: (identityRisk * 100).toInt(),
-                      description:
-                          "ตรวจพบการร้องขอให้ยืนยันตัวตนในรูปแบบที่ผิดปกติจากมาตรฐานบัญชีทั่วไป หรือลักษณะบัญชีผู้ส่งมีความน่าสงสัย",
+                      description: result?.identityDescription ?? "ไม่มีข้อมูล",
                     ),
                     const SizedBox(height: 18),
 
-                    buildGradientButton(context, "รายงานผล", "/report"),
+                    buildGradientButton(context, "รายงานผล", "/report", extra: {'actionRisk': actionRisk, 'identityRisk': identityRisk}),
                     const SizedBox(height: 120)
                   ],
                 ),
@@ -375,7 +373,7 @@ class _InsightCard extends StatelessWidget {
   }
 }
 
-Widget buildGradientButton(BuildContext context, String text, String link) {
+Widget buildGradientButton(BuildContext context, String text, String link, {Object? extra}) {
   return Container(
     width: double.infinity, // Takes full width of the parent container
     decoration: BoxDecoration(
@@ -395,7 +393,7 @@ Widget buildGradientButton(BuildContext context, String text, String link) {
       child: InkWell(
         borderRadius: BorderRadius.circular(18.0), // Matches container radius
         onTap: () {
-          context.go(link);
+          context.go(link, extra: extra);
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 16.0), // Vertical thickness

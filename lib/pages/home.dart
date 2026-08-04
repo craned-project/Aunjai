@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:aunjai/services/user_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,7 +10,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String username = "ธีระวิทย์";
+  String _username = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    try {
+      final profile = await UserService().getProfile();
+      if (mounted) {
+        setState(() {
+          _username = profile.username;
+        });
+      }
+    } catch (_) {
+      // Keep empty string on failure
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +50,7 @@ class _HomePageState extends State<HomePage> {
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: _buildHeader(username), // Your custom flush header widget
+            child: _buildHeader(_username), // Your custom flush header widget
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(

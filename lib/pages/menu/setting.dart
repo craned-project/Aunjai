@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import 'package:aunjai/utils.dart';
+import 'package:aunjai/services/user_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -10,12 +12,107 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  // 🎯 Reactive Toggle Switch States
+  // Reactive Toggle Switch States
   bool _shareAnonymousData = true;
   bool _notificationsEnabled = true;
-  String _username = "สมชาย อุ่นใจดี";
-  String _email = "somchayaunjaidee@gmail.com";
-  int lastUpdated = 1782828866;
+  String _username = "";
+  String _email = "";
+  int lastUpdated = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final profile = await UserService().getProfile();
+      setState(() {
+        _username = profile.username;
+        _email = profile.email;
+      });
+    } on DioException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(UserService().getErrorMessage(e))),
+        );
+      }
+    } catch (_) {
+      // silently fail, fields remain empty
+    }
+  }
+
+  Future<void> _showEditDialog({
+    required String field,
+    required String label,
+    required String currentValue,
+    bool isPassword = false,
+  }) async {
+    final controller = TextEditingController(
+      text: isPassword ? '' : currentValue,
+    );
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xff111827),
+        title: Text(label, style: const TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: controller,
+          obscureText: isPassword,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: isPassword ? 'ใส่รหัสผ่านใหม่' : 'ใส่ค่าใหม่',
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xff6366f1)),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(null),
+            child: const Text('ยกเลิก', style: TextStyle(color: Colors.white60)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: const Text('บันทึก', style: TextStyle(color: Color(0xff6366f1))),
+          ),
+        ],
+      ),
+    );
+
+    if (result == null || result.isEmpty) return;
+
+    try {
+      final updated = await UserService().updateProfile(
+        username: field == 'username' ? result : null,
+        email: field == 'email' ? result : null,
+        password: field == 'password' ? result : null,
+      );
+
+      setState(() {
+        _username = updated.username;
+        _email = updated.email;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('บันทึกสำเร็จ')),
+        );
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(UserService().getErrorMessage(e))),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,21 +179,34 @@ class _SettingsPageState extends State<SettingsPage> {
                         icon: Icons.person_outline,
                         title: "เปลี่ยนชื่อผู้ใช้",
                         subtitle: "ปัจจุบัน: ${_username}",
-                        onTap: () => print("Navigate to: Edit Username Page"),
+                        onTap: () => _showEditDialog(
+                          field: 'username',
+                          label: 'เปลี่ยนชื่อผู้ใช้',
+                          currentValue: _username,
+                        ),
                       ),
                       _buildDivider(),
                       _buildNavigationRow(
                         icon: Icons.mail_outline,
                         title: "เปลี่ยนอีเมล",
                         subtitle: maskEmail(_email),
-                        onTap: () => print("Navigate to: Edit Email Page"),
+                        onTap: () => _showEditDialog(
+                          field: 'email',
+                          label: 'เปลี่ยนอีเมล',
+                          currentValue: _email,
+                        ),
                       ),
                       _buildDivider(),
                       _buildNavigationRow(
                         icon: Icons.lock_outline,
                         title: "เปลี่ยนรหัสผ่าน",
                         subtitle: "อัปเดตล่าสุด${formatRelativeTime(lastUpdated)}",
-                        onTap: () => print("Navigate to: Change Password Page"),
+                        onTap: () => _showEditDialog(
+                          field: 'password',
+                          label: 'เปลี่ยนรหัสผ่าน',
+                          currentValue: '',
+                          isPassword: true,
+                        ),
                       ),
                     ],
                   ),

@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:aunjai/services/analysis_service.dart';
 
 class NewsCheck extends StatefulWidget {
   const NewsCheck({super.key});
@@ -13,7 +15,9 @@ class NewsCheck extends StatefulWidget {
 
 class _NewsCheckState extends State<NewsCheck> {
   final TextEditingController _newsController = TextEditingController();
-  
+  final AnalysisService _analysisService = AnalysisService();
+  bool _isLoading = false;
+
   // Image Upload State Variables
   final ImagePicker _picker = ImagePicker();
   List<XFile> _pickedFiles = [];
@@ -236,11 +240,37 @@ class _NewsCheckState extends State<NewsCheck> {
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  onPressed: () {
-                    final String newsContent = _newsController.text.trim();
-                    print("Sending News for verification: $newsContent");
-                    print("Total Images Attached: ${_pickedFiles.length}");
-                  },
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          final String newsContent = _newsController.text.trim();
+                          if (newsContent.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('กรุณากรอกเนื้อหาข่าวที่ต้องการตรวจสอบ')),
+                            );
+                            return;
+                          }
+                          setState(() => _isLoading = true);
+                          try {
+                            final result = await _analysisService.analyzeFakeNews(
+                              newsContent,
+                              'unknown',
+                              'social_media',
+                            );
+                            if (mounted) context.go('/result', extra: result);
+                          } on DioException catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(_analysisService.getErrorMessage(e)),
+                                  backgroundColor: Colors.red.shade700,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) setState(() => _isLoading = false);
+                          }
+                        },
                   child: const Text(
                     "ตรวจสอบข่าวนี้",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),

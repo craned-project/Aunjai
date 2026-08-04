@@ -77,7 +77,7 @@ class _CallResultPageState extends State<CallResultPage> {
                     ],
                   ),
                   GestureDetector(
-                    onTap: () => {context.go('/report')},
+                    onTap: () => {context.go('/report', extra: {'actionRisk': actionRisk, 'identityRisk': identityRisk})},
                     child: const Icon(
                       Icons.report,
                       color: Colors.redAccent,
@@ -192,7 +192,7 @@ class _CallResultPageState extends State<CallResultPage> {
                     ),
                     const SizedBox(height: 18),
 
-                    buildGradientButton(context, "รายงานผล", "/report"),
+                    buildGradientButton(context, "รายงานผล", "/report", extra: {'actionRisk': actionRisk, 'identityRisk': identityRisk}),
                     const SizedBox(height: 120), 
                   ],
                 ),
@@ -379,7 +379,7 @@ class _InsightCard extends StatelessWidget {
 }
 
 
-Widget buildGradientButton(BuildContext context, String text, String link) {
+Widget buildGradientButton(BuildContext context, String text, String link, {Object? extra}) {
   return Container(
     width: double.infinity, // Takes full width of the parent container
     decoration: BoxDecoration(
@@ -399,7 +399,7 @@ Widget buildGradientButton(BuildContext context, String text, String link) {
       child: InkWell(
         borderRadius: BorderRadius.circular(18.0), // Matches container radius
         onTap: () {
-          context.go(link);
+          context.go(link, extra: extra);
         },
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 16.0), // Vertical thickness

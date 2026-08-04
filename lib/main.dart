@@ -15,6 +15,9 @@ import 'package:aunjai/pages/menu/notification.dart';
 import 'package:aunjai/pages/menu/profile.dart';
 import 'package:aunjai/pages/menu/setting.dart';
 import 'package:aunjai/pages/report.dart';
+import 'package:aunjai/models/analysis_result.dart';
+import 'package:aunjai/services/storage_service.dart';
+import 'package:aunjai/core/auth_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,7 +31,18 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 
 final GoRouter _router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: '/login',
+  refreshListenable: AuthNotifier(),
+  redirect: (context, state) {
+    final authNotifier = AuthNotifier();
+    final loggedIn = authNotifier.isAuthenticated;
+    final location = state.matchedLocation;
+    final isAuthRoute = location == '/login' || location == '/register' || location == '/resetpw';
+
+    if (!loggedIn && !isAuthRoute) return '/login';
+    if (loggedIn && isAuthRoute) return '/home';
+    return null;
+  },
   routes: [
     // 1. The ShellRoute wraps EVERYTHING except login/register so they share the exact same background & navbar layout
     ShellRoute(
@@ -68,18 +82,21 @@ final GoRouter _router = GoRouter(
         GoRoute(path: '/image/result', builder: (context, state) => const ImageCheckPage()),
         GoRoute(path: '/link', builder: (context, state) => const LinkCheck()),
         GoRoute(path: '/news', builder: (context, state) => const NewsCheck()),
-        GoRoute(path: '/report', builder: (context, state) => const ReportPage()),
         GoRoute(
-          path: '/result', 
+          path: '/report',
           builder: (context, state) {
-            // Cast the extra parameter back into a Map
             final risks = state.extra as Map<String, double>?;
-            
-            return ResultPage(
-              actionRisk: risks?['actionRisk'] ?? 0.0,
-              identityRisk: risks?['identityRisk'] ?? 0.0,
-              contextRisk: risks?['contextRisk'] ?? 0.0
+            return ReportPage(
+              actionRisk: risks?['actionRisk'],
+              identityRisk: risks?['identityRisk'],
             );
+          }
+        ),
+        GoRoute(
+          path: '/result',
+          builder: (context, state) {
+            final result = state.extra as AnalysisResult?;
+            return ResultPage(analysisResult: result);
           }
         ),
       ],
@@ -92,7 +109,13 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final storage = StorageService();
+  final hasToken = await storage.hasToken();
+  if (hasToken) {
+    AuthNotifier().login();
+  }
   runApp(const MyApp());
 }
 

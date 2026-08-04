@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart'; // Needed for kIsWeb check
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
+import 'package:dio/dio.dart';
+import 'package:aunjai/services/analysis_service.dart';
+import 'package:aunjai/models/analysis_result.dart';
 import 'dart:io';
 
 class ImageUploadPage extends StatefulWidget {
@@ -13,10 +16,11 @@ class ImageUploadPage extends StatefulWidget {
 }
 
 class _ImageUploadPageState extends State<ImageUploadPage> {
-  // 🎯 ADJUSTABLE VARIABLES: Tweak these to change your bar values dynamically!
   bool _isSubmitEnabled = false;
+  bool _isLoading = false;
   List<XFile> _selectedFiles = [];
   int currentTabIdx = 0;
+  final AnalysisService _analysisService = AnalysisService();
 
   @override
   Widget build(BuildContext context) {
@@ -166,21 +170,31 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
                               ),
                             ),
                             child: ElevatedButton(
-                              onPressed: _isSubmitEnabled
-                                  ? () {
-                                      // 🎯 Your submit logic goes here!
-                                      print(
-                                        "Uploading ${_selectedFiles.length} images...",
-                                      );
-
-                                      for (int i = 0; i < _selectedFiles.length; i++) {
-                                        final file = _selectedFiles[i];
-                                        String displayTitle = p.basename(file.path);
-
-                                        print(displayTitle);
+                              onPressed: (_isSubmitEnabled && !_isLoading)
+                                  ? () async {
+                                      setState(() => _isLoading = true);
+                                      try {
+                                        final result = await _analysisService.analyzeImage(
+                                          _selectedFiles,
+                                          'general',
+                                        );
+                                        if (mounted) {
+                                          context.go('/result', extra: result);
+                                        }
+                                      } on DioException catch (e) {
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(_analysisService.getErrorMessage(e)),
+                                              backgroundColor: Colors.red.shade700,
+                                            ),
+                                          );
+                                        }
+                                      } finally {
+                                        if (mounted) setState(() => _isLoading = false);
                                       }
                                     }
-                                  : null, // Keeps the button natively unclickable
+                                  : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
